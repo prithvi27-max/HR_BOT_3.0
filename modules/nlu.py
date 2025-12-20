@@ -1,66 +1,60 @@
-# modules/nlu.py
-
-import re
-
-METRICS = {
-    "headcount": ["headcount", "employees", "workforce", "people"],
-    "salary": ["salary", "pay", "comp", "wage"],
-    "attrition": ["attrition", "turnover", "resign", "exit"],
-}
-
-DIMENSIONS = {
-    "Gender": ["gender", "male", "female"],
-    "Department": ["department", "dept"],
-    "Location": ["location", "city", "region"],
-    "Job_Level": ["job level", "level", "grade", "band"],
-}
-
-CHART_TYPES = {
-    "pie": ["pie"],
-    "bar": ["bar", "column"],
-    "line": ["trend", "line", "time"],
-    "hist": ["hist", "distribution"],
-}
-
-
 def detect_intent(query: str):
     q = query.lower()
 
-    # Detect Chart Request
-    if any(k in q for k in ["chart", "plot", "visual", "show", "graph", "pie", "bar", "line", "trend", "distribution"]):
-        return {"intent": "CHART"}
+    # --- BASIC METRICS ---
+    if "headcount" in q:
+        if any(k in q for k in ["trend", "over", "year", "month", "history", "timeline", "time"]):
+            return "HEADCOUNT_TREND"
+        return "HEADCOUNT"
 
-    # Definition request
-    if any(k in q for k in ["what is", "define", "explain", "meaning"]):
-        return {"intent": "DEFINITION"}
+    if "attrition" in q:
+        if any(k in q for k in ["trend", "year", "month", "over"]):
+            return "ATTRITION_TREND"
+        return "ATTRITION"
 
-    # Forecast or predict
-    if any(k in q for k in ["predict", "forecast", "future", "probability"]):
-        return {"intent": "ML_PREDICT"}
+    if any(k in q for k in ["salary", "pay", "compensation", "wage"]):
+        if any(k in q for k in ["by", "department", "role", "job"]):
+            return "SALARY_GROUP"
+        if any(k in q for k in ["trend", "over", "year"]):
+            return "SALARY_TREND"
+        return "SALARY"
 
-    # Otherwise general LLM
-    return {"intent": "GENERAL"}
+    if any(k in q for k in ["gender mix", "gender ratio", "diversity", "male", "female"]):
+        return "GENDER"
 
+    if "engagement" in q:
+        return "ENGAGEMENT"
 
-def extract_metric(query):
-    q = query.lower()
-    for metric, keys in METRICS.items():
-        if any(k in q for k in keys):
-            return metric
-    return None
+    if "performance" in q:
+        if any(k in q for k in ["by", "department"]):
+            return "PERFORMANCE_GROUP"
+        return "PERFORMANCE"
 
+    if "promotion" in q:
+        return "PROMOTION"
 
-def extract_dimension(query):
-    q = query.lower()
-    for dim, keys in DIMENSIONS.items():
-        if any(k in q for k in keys):
-            return dim
-    return None
+    if "hire" in q or "new join" in q or "joined" in q:
+        return "HIRING"
 
+    # --- CHART REQUESTS ---
+    if any(k in q for k in ["chart", "plot", "graph", "visual"]):
+        return "CHART"
 
-def extract_chart_type(query):
-    q = query.lower()
-    for ctype, keys in CHART_TYPES.items():
-        if any(k in q for k in keys):
-            return ctype
-    return "bar"   # default bar chart
+    # --- ML Prediction ---
+    if "predict attrition" in q:
+        return "PREDICT_ATTRITION"
+
+    # --- STATS ---
+    if any(k in q for k in ["mean", "average"]):
+        return "STATS_MEAN"
+    if any(k in q for k in ["median"]):
+        return "STATS_MEDIAN"
+    if any(k in q for k in ["mode"]):
+        return "STATS_MODE"
+    if any(k in q for k in ["std", "standard deviation"]):
+        return "STATS_STD"
+    if any(k in q for k in ["percentile", "quartile"]):
+        return "STATS_PERCENTILE"
+
+    # default
+    return "PURE_CHAT"
