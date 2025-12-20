@@ -1,8 +1,8 @@
-# config.py
+import os
 
-# ===== OPENAI API KEY =====
-# Replace with your key once you have it
-GROQ_API_KEY = ""
+# ===== GROQ API KEY FROM ENV =====
+# Streamlit secrets or system env will fill this
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
 # ===== APP SETTINGS =====
 APP_NAME = "HR Analytics Assistant V3"
