@@ -5,7 +5,7 @@ import re
 # ---------------------------
 metric_keywords = {
     "headcount": [
-        "headcount", "employee count", "workforce", "staff size", 
+        "headcount", "employee count", "workforce", "staff size",
         "total employees", "number of employees", "manpower"
     ],
     "attrition": [
@@ -41,12 +41,12 @@ metric_keywords = {
 # DIMENSION EXTRACTION (BY WHAT?)
 # ---------------------------
 dimension_keywords = {
-    "year": ["year", "annual", "per year", "trend", "over time", "timeline"],
-    "month": ["month", "monthly"],
-    "quarter": ["quarter", "q1", "q2", "q3", "q4"],
-    "department": ["department", "function", "team"],
-    "location": ["location", "region", "country", "city", "branch"],
-    "gender": ["male", "female", "gender"],
+    "YEAR": ["year", "annual", "per year", "trend", "over time", "timeline", "yearly"],
+    "MONTH": ["month", "monthly"],
+    "QUARTER": ["quarter", "q1", "q2", "q3", "q4"],
+    "DEPARTMENT": ["department", "function", "team"],
+    "LOCATION": ["location", "region", "country", "city", "branch"],
+    "GENDER": ["male", "female", "gender"],
 }
 
 # ---------------------------
@@ -55,18 +55,18 @@ dimension_keywords = {
 def extract_chart_type(q):
     q = q.lower()
     
-    if any(k in q for k in ["line", "trend", "over time", "time series"]):
+    if any(k in q for k in ["line", "trend", "over time", "time series", "timeline", "year"]):
         return "LINE"
-    if any(k in q for k in ["pie", "ratio", "share", "distribution by gender"]):
+    if any(k in q for k in ["pie", "ratio", "share", "gender mix"]):
         return "PIE"
-    if any(k in q for k in ["bar", "compare", "comparison"]):
-        return "BAR"
     if any(k in q for k in ["histogram", "distribution", "range"]):
         return "HIST"
-    if any(k in q for k in ["box", "spread", "median"]):
+    if any(k in q for k in ["box", "median", "spread"]):
         return "BOX"
+    if any(k in q for k in ["bar", "compare", "comparison"]):
+        return "BAR"
     
-    return "BAR"  # default
+    return "BAR"  # default fallback
 
 # ---------------------------
 # METRIC INTENT DETECTION
@@ -85,7 +85,7 @@ def extract_dimension(query):
     q = query.lower()
     for dim, synonyms in dimension_keywords.items():
         if any(word in q for word in synonyms):
-            return dim.upper()
+            return dim
     return None
 
 # ---------------------------
@@ -95,21 +95,21 @@ def detect_intent(query):
     q = query.lower()
 
     # Chart request?
-    if any(k in q for k in ["chart", "plot", "graph", "visualize", "distribution"]):
+    if any(k in q for k in ["chart", "plot", "graph", "visualize", "show", "distribution"]):
         return {"intent": "CHART"}
 
-    # Metric request?
+    # Forecast request
+    if "forecast" in q or "predict" in q or "projection" in q:
+        return {"intent": "FORECAST"}
+
+    # Metric request
     metric = extract_metric(query)
     if metric:
         return {"intent": "METRIC", "metric": metric}
 
-    # Forecast request?
-    if "forecast" in q or "predict" in q:
-        return {"intent": "FORECAST"}
-
-    # Generic info (definition)
-    if any(k in q for k in ["what is", "meaning", "define"]):
+    # HR concept – definition
+    if any(k in q for k in ["what is", "meaning", "define", "explain"]):
         return {"intent": "DEFINITION"}
 
-    # Fallback: treat as LLM query
+    # Fallback to LLM
     return {"intent": "GENERAL"}
