@@ -1,41 +1,66 @@
 import streamlit as st
 from modules.analytics import load_master
-from modules.charts import compute_metric, compute_trend_metric, build_chart
 from modules.llm_engine import call_llm
-from modules.nlu import extract_metric, extract_dimension, extract_chart_type, detect_intent
+from modules.nlu import detect_intent, extract_metric, extract_dimension, extract_chart_type
+from modules.charts import compute_metric, compute_trend_metric, build_chart
+
+
+def llm_explain(text, language="en"):
+    prompt = f"Explain briefly for HR leaders: {text}. Respond in {language}."
+    return call_llm(prompt, language)
+
 
 def process_query(query, language="en"):
     df = load_master()
-    parsed = detect_intent(query)
-    intent = parsed.get("intent")
+    result = detect_intent(query)
+    intent = result.get("intent")
 
-    # 1. Definition
+    # 🤖 Generic LLM definition queries
     if intent == "DEFINITION":
-        return call_llm(f"Explain in HR context: {query}", language)
-
-    # 2. Generic LLM answer
-    if intent == "GENERAL":
         return call_llm(query, language)
 
-    # 3. Metric or Chart
-    if intent in ["METRIC", "CHART"]:
+    # 📊 CHART REQUEST
+    if intent == "CHART":
         metric = extract_metric(query)
         dimension = extract_dimension(query)
-        chart = extract_chart_type(query)
+        chart_type = extract_chart_type(query)
 
-        # TREND (LINE)
-        if dimension in ["YEAR", "MONTH", "QUARTER"]:
-            data = compute_trend_metric(df, metric, dimension)
-            fig = build_chart(data, metric, chart, dimension)
+        if metric is None:
+            return "❓ Please mention metric (headcount, salary, attrition, gender)."
+
+        # TREND request
+        if "trend" in query or "over years" in query or "by year" in query:
+            data = compute_trend_metric(df, metric)
+            if data is None:
+                return "⚠ Trend metric not supported yet."
+
+            fig = build_chart(data, metric, "line")
             st.plotly_chart(fig)
-            return f"📈 Showing {metric} trend by {dimension.lower()}"
 
-        # NO DIMENSION → simple KPI
-        data = compute_metric(df, metric)
-        return f"🔹 {metric.upper()}: {data}"
+            st.download_button(
+                "📥 Download Trend CSV",
+                data.reset_index().to_csv(index=False),
+                f"{metric}_trend.csv",
+                "text/csv"
+            )
+            return None
 
-    # 4. Forecast
-    if intent == "FORECAST":
-        return "🔮 Forecast ML model will be added in Phase-2"
+        # Normal breakdown chart
+        data = compute_metric(df, metric, dimension)
+        if data is None:
+            return "⚠ No breakdown available. Try: headcount by department / salary by location"
 
-    return "❓ I could not classify this query."
+        fig = build_chart(data, metric, chart_type)
+        st.plotly_chart(fig)
+
+        st.download_button(
+            "📥 Download CSV",
+            data.reset_index().to_csv(index=False),
+            f"{metric}_chart.csv",
+            "text/csv"
+        )
+
+        return None
+
+    # Fallback to LLM
+    return call_llm(query, language)
