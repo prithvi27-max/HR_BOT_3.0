@@ -36,22 +36,35 @@ def compute_metric(df, metric, dimension):
 # TREND METRIC COMPUTATION
 # =========================================================
 def compute_trend_metric(df, metric):
-    df = ensure_date_and_year(df)
+    # Normalize and extract year
+    df["Hire_Date"] = pd.to_datetime(df["Hire_Date"], errors="coerce", dayfirst=True)
+    df["Hire_Year"] = df["Hire_Date"].dt.year
 
-    # 1️⃣ Headcount Trend
+    # Drop rows where year is missing
+    df = df.dropna(subset=["Hire_Year"])
+
+    # HEADCOUNT TREND
     if metric == "headcount":
         return df.groupby("Hire_Year")["Employee_ID"].count()
 
-    # 2️⃣ Attrition Trend
+    # ATTRITION TREND
     if metric == "attrition":
+        # Create numeric flag from Status
         df["Attrition_Flag"] = df["Status"].replace({"Resigned": 1, "Active": 0})
-        return df.groupby("Hire_Year")["Attrition_Flag"].mean() * 100
 
-    # 3️⃣ Salary Trend
+        # Force numeric
+        df["Attrition_Flag"] = pd.to_numeric(df["Attrition_Flag"], errors="coerce").fillna(0)
+
+        # Compute percentage
+        trend = df.groupby("Hire_Year")["Attrition_Flag"].mean() * 100
+        return trend
+
+    # SALARY TREND
     if metric == "salary":
         return df.groupby("Hire_Year")["Salary"].mean()
 
     return None
+
 
 
 # =========================================================
