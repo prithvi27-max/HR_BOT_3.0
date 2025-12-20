@@ -1,0 +1,1229 @@
+Employee_ID,Department,Location,Exit_Date,Experience_Years
+E00001,IT,New York,2024-07-03,7
+E00006,IT,Sydney,2025-05-05,1
+E00017,IT,Berlin,2025-11-22,10
+E00018,Sales,London,2025-12-05,2
+E00020,IT,Sydney,2025-06-09,1
+E00024,Finance,Sydney,2025-02-21,4
+E00037,Sales,New York,2022-05-04,6
+E00038,R&D,Tokyo,2019-01-16,9
+E00041,R&D,Berlin,2025-10-22,6
+E00044,R&D,Singapore,2020-07-03,10
+E00054,Finance,London,2023-01-03,3
+E00065,HR,London,2025-03-10,0
+E00066,Finance,London,2025-04-22,0
+E00079,HR,London,2024-07-10,6
+E00082,Marketing,New York,2022-07-07,8
+E00090,Marketing,Toronto,2021-01-05,6
+E00092,HR,Tokyo,2025-03-17,0
+E00095,Operations,London,2025-06-05,3
+E00103,Operations,Sydney,2024-10-12,3
+E00105,HR,Toronto,2024-08-12,2
+E00106,IT,Singapore,2024-01-09,3
+E00120,IT,New York,2025-03-30,9
+E00122,Operations,Tokyo,2024-06-15,5
+E00127,Sales,Singapore,2023-01-03,5
+E00137,HR,Berlin,2025-07-11,2
+E00155,IT,Berlin,2020-07-22,10
+E00157,Marketing,Sydney,2024-08-10,3
+E00165,Operations,New York,2025-04-11,1
+E00170,Sales,London,2025-11-19,2
+E00180,R&D,Singapore,2021-03-26,6
+E00191,R&D,Tokyo,2023-10-28,3
+E00200,R&D,London,2023-05-16,8
+E00224,Sales,Sydney,2024-11-11,6
+E00248,Marketing,London,2020-09-28,10
+E00254,Sales,Berlin,2022-12-21,7
+E00285,HR,Tokyo,2025-08-26,5
+E00296,Finance,Berlin,2024-11-30,3
+E00301,Operations,New York,2023-11-01,5
+E00318,IT,Singapore,2024-01-17,3
+E00322,Sales,Tokyo,2024-04-11,3
+E00333,Marketing,Toronto,2022-08-24,7
+E00334,R&D,Toronto,2019-08-16,9
+E00350,HR,Singapore,2021-12-06,10
+E00354,HR,Singapore,2024-09-19,9
+E00358,IT,Berlin,2023-03-07,4
+E00361,Finance,London,2025-01-31,0
+E00365,R&D,London,2018-02-20,10
+E00369,IT,Toronto,2025-03-02,1
+E00378,IT,Tokyo,2024-12-24,3
+E00398,Finance,Singapore,2020-08-31,6
+E00425,Marketing,London,2021-01-01,5
+E00439,R&D,New York,2022-06-29,4
+E00452,Sales,Tokyo,2019-04-28,9
+E00465,Operations,Singapore,2025-02-12,3
+E00468,R&D,Berlin,2021-05-06,9
+E00473,Operations,Singapore,2023-08-15,9
+E00474,Marketing,Toronto,2022-08-11,8
+E00478,HR,Singapore,2021-06-07,8
+E00490,IT,Sydney,2022-06-17,8
+E00492,Finance,Sydney,2018-12-02,10
+E00494,Finance,Tokyo,2024-08-17,3
+E00509,Operations,Toronto,2025-03-14,0
+E00512,Marketing,Tokyo,2024-01-11,6
+E00518,R&D,London,2021-07-08,6
+E00536,IT,New York,2025-01-04,2
+E00544,R&D,Toronto,2022-08-28,4
+E00548,Sales,New York,2024-05-04,8
+E00560,R&D,New York,2025-01-09,4
+E00565,HR,Sydney,2021-02-25,6
+E00571,IT,Berlin,2025-09-27,2
+E00585,Operations,Singapore,2023-04-27,3
+E00586,R&D,New York,2025-02-10,6
+E00590,HR,Toronto,2023-05-07,9
+E00602,Sales,Tokyo,2021-09-27,8
+E00634,R&D,Singapore,2021-02-22,5
+E00642,Sales,Singapore,2025-10-05,8
+E00650,HR,Tokyo,2019-02-05,9
+E00656,Sales,Toronto,2016-11-09,10
+E00658,Marketing,Sydney,2024-11-02,5
+E00667,HR,Singapore,2025-07-17,3
+E00668,Sales,London,2025-07-15,4
+E00674,R&D,Toronto,2024-04-05,2
+E00695,Marketing,Berlin,2025-03-15,5
+E00696,Finance,Berlin,2023-04-21,6
+E00702,Finance,Tokyo,2020-04-06,6
+E00707,Operations,Tokyo,2025-10-08,8
+E00708,R&D,London,2021-01-16,6
+E00709,IT,Singapore,2024-11-25,4
+E00723,R&D,Singapore,2024-10-03,3
+E00724,HR,New York,2023-01-07,3
+E00725,Marketing,Berlin,2025-10-19,0
+E00754,R&D,Berlin,2024-05-12,7
+E00757,R&D,New York,2025-06-20,1
+E00778,HR,Sydney,2021-06-02,6
+E00782,Marketing,London,2025-10-08,2
+E00790,Operations,London,2017-11-05,9
+E00791,Marketing,Tokyo,2020-06-17,7
+E00805,R&D,Berlin,2020-10-31,9
+E00807,HR,London,2025-03-23,1
+E00812,Sales,London,2023-11-26,6
+E00817,R&D,Sydney,2020-01-03,6
+E00819,Operations,Singapore,2016-04-22,10
+E00821,R&D,Sydney,2025-08-13,3
+E00827,Operations,Tokyo,2023-11-02,6
+E00830,Marketing,New York,2025-02-12,1
+E00842,Sales,Tokyo,2023-06-24,4
+E00855,Sales,Sydney,2024-07-26,2
+E00874,Finance,Sydney,2025-10-27,3
+E00886,IT,New York,2022-06-26,6
+E00888,Marketing,Berlin,2020-11-11,9
+E00899,Sales,Toronto,2025-04-09,2
+E00908,Operations,Tokyo,2022-02-24,4
+E00910,Sales,New York,2023-09-14,6
+E00913,IT,Berlin,2017-09-10,9
+E00920,Operations,Sydney,2024-07-03,10
+E00922,HR,Sydney,2024-03-08,5
+E00925,Marketing,London,2021-05-18,5
+E00926,HR,Toronto,2024-12-25,2
+E00942,Operations,Singapore,2024-08-25,7
+E00944,Marketing,London,2024-09-25,2
+E00949,Finance,New York,2024-06-19,7
+E00950,IT,London,2022-02-11,4
+E00961,IT,Sydney,2024-06-18,3
+E00964,R&D,Berlin,2025-02-19,1
+E00984,Marketing,New York,2023-05-13,3
+E01001,Marketing,Toronto,2025-08-20,1
+E01006,IT,Tokyo,2020-06-19,7
+E01010,HR,New York,2020-08-02,9
+E01011,Marketing,Sydney,2024-08-12,6
+E01025,Marketing,Berlin,2021-09-24,5
+E01027,R&D,Toronto,2025-01-30,1
+E01038,Finance,New York,2025-07-11,2
+E01039,Sales,Berlin,2023-02-20,6
+E01055,Finance,Tokyo,2020-07-05,10
+E01057,Marketing,New York,2017-02-02,9
+E01062,Sales,Tokyo,2025-03-22,2
+E01063,Marketing,Toronto,2025-02-24,1
+E01074,Marketing,Toronto,2025-02-04,4
+E01083,HR,Singapore,2025-03-06,2
+E01085,Marketing,London,2025-04-17,8
+E01087,R&D,Sydney,2025-08-11,1
+E01091,Operations,Berlin,2023-11-04,4
+E01103,Sales,Singapore,2020-10-23,7
+E01104,R&D,New York,2021-09-24,5
+E01105,HR,London,2023-02-07,9
+E01112,IT,Berlin,2018-01-04,10
+E01114,Operations,Sydney,2024-03-06,3
+E01117,Finance,Toronto,2025-03-14,0
+E01129,Operations,London,2025-02-17,0
+E01158,Marketing,Sydney,2020-12-04,10
+E01159,Operations,Sydney,2022-10-13,5
+E01162,Finance,Toronto,2024-04-09,4
+E01166,IT,London,2023-02-17,5
+E01186,R&D,Sydney,2024-08-17,6
+E01198,HR,Sydney,2025-12-11,3
+E01210,HR,Sydney,2025-04-03,2
+E01221,R&D,New York,2025-03-26,0
+E01235,IT,Toronto,2020-10-12,7
+E01238,Marketing,Toronto,2025-07-07,1
+E01244,Finance,Berlin,2025-12-03,9
+E01249,IT,London,2022-12-05,6
+E01267,R&D,Sydney,2022-03-07,5
+E01291,IT,London,2018-12-08,8
+E01308,Sales,Toronto,2024-11-09,2
+E01313,Operations,Toronto,2024-11-16,10
+E01318,Operations,New York,2021-04-16,5
+E01328,Sales,Tokyo,2025-11-29,4
+E01330,R&D,Sydney,2025-01-30,0
+E01344,Marketing,Toronto,2017-01-20,9
+E01372,Marketing,New York,2025-10-12,0
+E01373,Sales,Tokyo,2025-05-21,4
+E01377,Sales,Tokyo,2022-12-27,8
+E01387,HR,Berlin,2022-07-13,7
+E01423,Sales,New York,2021-08-15,6
+E01436,R&D,Singapore,2025-09-07,6
+E01464,Finance,London,2025-12-11,0
+E01466,Marketing,New York,2025-04-21,4
+E01470,Operations,London,2025-02-09,0
+E01473,IT,Singapore,2016-12-24,10
+E01479,Sales,Sydney,2025-07-26,0
+E01480,Sales,London,2025-05-01,2
+E01485,R&D,Tokyo,2021-10-17,7
+E01487,R&D,New York,2025-01-11,2
+E01492,Sales,Berlin,2023-02-08,10
+E01494,Sales,Toronto,2025-07-22,1
+E01528,IT,Toronto,2022-03-29,5
+E01535,HR,Tokyo,2025-01-23,2
+E01557,HR,Toronto,2024-07-26,2
+E01560,Finance,Toronto,2025-10-28,4
+E01573,R&D,Singapore,2025-10-25,0
+E01577,Sales,Singapore,2018-08-01,9
+E01579,Finance,London,2019-08-10,8
+E01582,IT,New York,2024-04-10,6
+E01598,IT,New York,2024-01-26,4
+E01604,HR,Sydney,2025-06-16,0
+E01615,Sales,Singapore,2024-08-27,7
+E01646,IT,New York,2018-09-07,9
+E01651,Sales,New York,2024-06-24,2
+E01656,Operations,Berlin,2025-08-08,0
+E01657,IT,Tokyo,2023-08-24,4
+E01658,Marketing,Singapore,2019-01-24,9
+E01663,Finance,London,2022-05-15,4
+E01665,Marketing,Tokyo,2025-01-17,9
+E01678,Sales,Tokyo,2022-04-19,8
+E01684,HR,London,2024-07-12,7
+E01702,Sales,Tokyo,2020-05-19,8
+E01705,Marketing,London,2023-07-16,7
+E01715,IT,London,2024-12-08,6
+E01731,Operations,Tokyo,2017-12-15,9
+E01732,Sales,Singapore,2018-09-27,10
+E01739,Finance,Tokyo,2025-04-27,10
+E01744,HR,Tokyo,2022-09-10,5
+E01748,Sales,Tokyo,2025-03-28,5
+E01761,Finance,Berlin,2025-11-30,2
+E01762,Sales,Sydney,2025-10-28,8
+E01781,Sales,Toronto,2025-07-03,0
+E01790,IT,Singapore,2023-10-20,4
+E01797,Finance,Tokyo,2019-09-20,9
+E01800,Finance,New York,2025-03-27,1
+E01812,IT,Singapore,2024-04-20,10
+E01814,IT,Sydney,2025-05-07,9
+E01816,Finance,Singapore,2025-02-28,2
+E01818,Sales,New York,2018-03-16,10
+E01823,IT,Sydney,2016-02-02,10
+E01848,Operations,Singapore,2025-08-01,10
+E01856,R&D,Tokyo,2020-10-24,7
+E01860,Operations,London,2021-03-30,7
+E01865,Operations,Tokyo,2023-06-17,7
+E01866,Operations,Sydney,2025-11-17,7
+E01877,Operations,Tokyo,2022-02-26,10
+E01882,Marketing,Singapore,2025-08-08,1
+E01884,R&D,Sydney,2022-08-20,7
+E01911,Finance,Toronto,2023-07-05,5
+E01912,Operations,Berlin,2025-04-14,1
+E01918,Operations,Singapore,2025-09-27,9
+E01922,HR,Sydney,2021-09-06,10
+E01923,HR,Tokyo,2022-06-23,5
+E01946,R&D,Tokyo,2021-02-02,8
+E01963,IT,Sydney,2023-07-25,4
+E01965,Sales,Toronto,2023-01-13,9
+E01986,IT,Tokyo,2024-07-12,7
+E01987,HR,Sydney,2023-06-05,6
+E01989,Marketing,Sydney,2024-09-25,10
+E01995,Sales,Toronto,2025-04-28,1
+E02002,IT,Sydney,2024-11-24,8
+E02004,Sales,Sydney,2024-02-26,9
+E02016,Marketing,New York,2022-08-08,5
+E02018,Operations,Toronto,2025-01-01,1
+E02019,Sales,Sydney,2025-02-21,1
+E02022,IT,Berlin,2025-10-05,2
+E02023,Marketing,London,2025-03-22,1
+E02026,IT,Singapore,2025-01-30,2
+E02031,R&D,Tokyo,2024-11-17,5
+E02040,R&D,Berlin,2021-09-07,5
+E02042,Finance,Singapore,2022-06-12,4
+E02048,HR,Toronto,2025-03-06,2
+E02051,Finance,Singapore,2020-11-11,9
+E02061,Finance,Tokyo,2022-05-30,9
+E02069,Finance,New York,2018-06-05,10
+E02096,HR,Toronto,2023-02-09,9
+E02099,Marketing,New York,2024-04-12,5
+E02108,Marketing,New York,2025-08-13,3
+E02111,HR,Tokyo,2024-02-11,5
+E02112,IT,Sydney,2021-07-21,9
+E02113,IT,New York,2022-08-08,4
+E02115,Sales,Berlin,2025-08-07,0
+E02116,HR,Singapore,2022-10-25,10
+E02118,Operations,Berlin,2023-09-26,6
+E02142,Operations,Berlin,2025-08-16,3
+E02145,HR,Singapore,2025-03-28,2
+E02151,R&D,London,2025-03-15,2
+E02156,Marketing,Tokyo,2025-06-24,1
+E02172,HR,Singapore,2025-09-06,2
+E02173,Operations,Tokyo,2023-11-28,3
+E02180,Sales,Toronto,2019-04-25,10
+E02182,HR,Tokyo,2024-10-07,3
+E02192,IT,Sydney,2025-09-08,2
+E02198,R&D,Berlin,2024-05-20,4
+E02199,Sales,Toronto,2024-05-18,7
+E02207,Marketing,Sydney,2018-04-23,8
+E02211,IT,London,2025-10-21,3
+E02231,IT,New York,2020-04-28,8
+E02234,IT,London,2025-07-24,1
+E02240,Marketing,Berlin,2022-04-21,4
+E02246,Sales,Singapore,2020-03-10,7
+E02247,HR,Tokyo,2019-05-20,7
+E02250,IT,London,2020-06-01,7
+E02252,HR,Tokyo,2018-06-26,10
+E02270,Marketing,Tokyo,2023-11-16,8
+E02271,HR,Sydney,2025-05-24,1
+E02303,Operations,Singapore,2024-01-03,9
+E02312,IT,Singapore,2025-09-14,4
+E02338,Finance,Tokyo,2017-11-27,10
+E02362,HR,London,2024-11-11,5
+E02363,Sales,Sydney,2022-01-23,9
+E02369,Finance,Tokyo,2025-04-26,0
+E02374,Finance,Toronto,2019-12-04,10
+E02384,IT,Sydney,2024-03-07,5
+E02402,Finance,New York,2018-06-23,10
+E02409,Marketing,Singapore,2024-08-01,8
+E02416,HR,Berlin,2019-01-12,7
+E02417,Sales,Berlin,2023-06-06,3
+E02427,R&D,Berlin,2023-03-26,3
+E02435,Marketing,Tokyo,2020-11-04,9
+E02456,Marketing,London,2022-03-04,4
+E02466,Operations,London,2022-06-17,7
+E02497,Marketing,Toronto,2020-05-05,6
+E02499,IT,Toronto,2025-02-19,0
+E02502,HR,London,2025-12-08,1
+E02505,Finance,Tokyo,2025-12-16,0
+E02509,IT,Toronto,2025-08-24,1
+E02521,HR,Sydney,2025-11-03,0
+E02529,Sales,London,2019-12-24,7
+E02543,HR,New York,2025-04-22,1
+E02545,Operations,Berlin,2022-09-22,8
+E02546,R&D,Singapore,2025-05-07,7
+E02550,Finance,Toronto,2021-02-04,10
+E02551,Marketing,New York,2025-02-12,0
+E02569,R&D,Sydney,2023-08-30,10
+E02580,Sales,London,2025-05-30,3
+E02585,HR,Singapore,2024-08-11,3
+E02590,HR,New York,2016-06-19,10
+E02596,Sales,Tokyo,2018-08-24,8
+E02599,Sales,Tokyo,2022-07-12,8
+E02609,Finance,Sydney,2024-08-15,8
+E02626,Finance,New York,2017-10-16,10
+E02640,Operations,New York,2023-10-07,5
+E02650,HR,Tokyo,2025-08-08,4
+E02662,Operations,Singapore,2025-01-17,8
+E02675,Operations,Berlin,2025-08-16,7
+E02679,Finance,Toronto,2025-01-09,1
+E02684,R&D,Singapore,2020-03-23,7
+E02697,R&D,Sydney,2025-06-07,0
+E02699,Operations,Toronto,2025-03-04,6
+E02705,IT,Singapore,2019-08-09,8
+E02718,Finance,Berlin,2025-06-11,2
+E02725,HR,Toronto,2023-08-05,7
+E02728,Marketing,Singapore,2025-08-15,2
+E02729,Sales,Sydney,2025-10-22,5
+E02731,Operations,Sydney,2025-09-17,8
+E02743,Marketing,Toronto,2019-04-07,9
+E02755,R&D,Singapore,2019-02-26,10
+E02759,R&D,Toronto,2021-10-25,7
+E02773,Sales,Tokyo,2021-08-28,6
+E02794,Finance,Singapore,2021-06-08,10
+E02796,Sales,London,2024-09-11,6
+E02805,Sales,Tokyo,2025-08-12,0
+E02811,Sales,London,2025-05-02,9
+E02818,Sales,Sydney,2025-12-17,0
+E02820,Finance,Berlin,2023-11-18,9
+E02830,IT,London,2023-11-12,10
+E02836,Marketing,New York,2020-07-07,8
+E02848,Operations,London,2022-09-17,4
+E02854,Operations,New York,2024-05-18,2
+E02857,R&D,London,2021-09-04,8
+E02863,Finance,Sydney,2022-03-08,4
+E02869,Finance,London,2022-08-19,6
+E02872,Sales,Tokyo,2023-09-15,6
+E02874,Operations,Singapore,2024-08-05,4
+E02878,Finance,Singapore,2020-02-28,7
+E02879,Sales,Singapore,2024-01-09,8
+E02888,R&D,Tokyo,2019-01-27,9
+E02889,Marketing,Toronto,2019-06-08,8
+E02893,IT,Berlin,2020-05-28,6
+E02908,Finance,Toronto,2025-09-25,8
+E02912,R&D,Sydney,2022-10-09,6
+E02915,HR,Tokyo,2019-06-05,10
+E02923,Marketing,Singapore,2024-06-25,6
+E02938,Operations,Tokyo,2025-12-14,1
+E02945,Sales,New York,2024-09-14,6
+E02959,Operations,Singapore,2022-03-08,7
+E02967,IT,Sydney,2023-01-30,6
+E02970,Operations,Sydney,2022-11-28,10
+E02973,R&D,Sydney,2025-03-15,1
+E02984,Finance,Singapore,2025-12-05,1
+E03012,Operations,Sydney,2025-04-09,1
+E03014,Finance,Singapore,2023-06-20,3
+E03033,Marketing,New York,2020-02-01,6
+E03038,IT,New York,2019-12-13,8
+E03053,Operations,London,2025-01-01,0
+E03055,HR,Sydney,2021-06-11,9
+E03061,R&D,New York,2025-08-07,0
+E03072,Sales,Berlin,2024-09-22,6
+E03075,Sales,Sydney,2022-07-04,7
+E03081,R&D,London,2024-10-28,6
+E03091,HR,London,2024-01-11,4
+E03092,R&D,New York,2025-11-28,6
+E03103,Operations,Sydney,2025-08-10,3
+E03126,IT,Berlin,2021-06-26,5
+E03143,HR,Berlin,2025-10-06,0
+E03147,Operations,Sydney,2025-05-30,0
+E03155,IT,Berlin,2021-12-05,5
+E03165,HR,Tokyo,2025-05-15,10
+E03169,Sales,New York,2025-04-11,0
+E03198,Sales,Toronto,2021-03-02,6
+E03209,Operations,Toronto,2022-02-05,6
+E03222,Operations,New York,2024-01-14,4
+E03226,HR,Berlin,2016-11-21,10
+E03228,Marketing,Sydney,2025-01-28,1
+E03247,HR,Toronto,2021-05-08,7
+E03258,R&D,Singapore,2025-06-13,1
+E03265,R&D,New York,2025-12-28,9
+E03284,Marketing,Tokyo,2023-10-04,3
+E03294,Marketing,Sydney,2025-12-20,0
+E03310,Operations,London,2025-08-29,1
+E03321,Marketing,Sydney,2025-02-05,0
+E03322,IT,Tokyo,2024-04-13,3
+E03325,R&D,Berlin,2024-09-29,7
+E03337,Operations,Toronto,2025-01-17,3
+E03340,Operations,Sydney,2023-05-23,3
+E03361,HR,Berlin,2025-06-29,2
+E03377,Finance,Tokyo,2018-12-29,10
+E03383,Sales,Singapore,2021-07-29,6
+E03384,Operations,Sydney,2024-10-17,9
+E03386,Operations,Singapore,2022-12-20,4
+E03390,IT,New York,2022-01-23,6
+E03393,R&D,Singapore,2024-04-03,2
+E03396,R&D,Sydney,2023-03-14,3
+E03403,Operations,Berlin,2024-10-30,2
+E03409,Finance,Sydney,2025-10-17,0
+E03411,Operations,Tokyo,2022-08-02,7
+E03417,Sales,Berlin,2025-01-15,4
+E03420,Operations,London,2017-03-15,10
+E03424,Marketing,London,2021-10-09,9
+E03425,Marketing,Singapore,2023-09-28,4
+E03448,Finance,New York,2023-11-05,10
+E03452,HR,Toronto,2020-01-06,8
+E03459,Operations,Berlin,2025-11-24,2
+E03462,HR,Singapore,2022-12-15,5
+E03490,Operations,Berlin,2025-07-09,0
+E03492,R&D,New York,2024-09-06,2
+E03506,Operations,New York,2018-01-01,10
+E03510,Operations,Tokyo,2022-07-13,4
+E03515,Finance,New York,2018-11-07,8
+E03518,Finance,Toronto,2024-06-16,5
+E03528,IT,Sydney,2025-09-05,2
+E03547,HR,London,2018-11-09,9
+E03555,Operations,Berlin,2024-01-06,8
+E03567,Sales,Singapore,2025-07-17,0
+E03573,IT,Berlin,2020-07-02,7
+E03579,R&D,Toronto,2024-02-24,3
+E03593,Operations,New York,2017-06-26,9
+E03604,R&D,New York,2025-11-25,6
+E03605,HR,Toronto,2025-05-01,6
+E03607,Sales,Tokyo,2020-07-19,9
+E03608,IT,Sydney,2021-01-19,9
+E03612,Operations,Singapore,2024-03-29,10
+E03619,Sales,Berlin,2025-06-20,4
+E03633,Marketing,London,2025-06-26,0
+E03644,IT,New York,2023-10-10,9
+E03648,HR,New York,2021-04-04,9
+E03652,Sales,Toronto,2024-02-10,4
+E03654,Operations,Toronto,2025-02-01,1
+E03667,Marketing,Sydney,2025-11-26,0
+E03679,Finance,Berlin,2024-04-29,8
+E03683,Marketing,Tokyo,2023-01-28,5
+E03688,Finance,Toronto,2021-05-15,6
+E03701,Operations,Berlin,2021-06-06,10
+E03717,Operations,Singapore,2025-07-30,3
+E03724,R&D,Sydney,2023-01-04,4
+E03729,Sales,Singapore,2024-04-17,2
+E03736,Sales,London,2022-08-23,5
+E03740,IT,Tokyo,2025-03-09,0
+E03761,Finance,London,2022-08-08,5
+E03764,R&D,Berlin,2021-12-18,5
+E03776,IT,London,2025-02-11,5
+E03787,Operations,New York,2023-07-15,4
+E03798,Operations,Toronto,2023-11-18,5
+E03813,IT,Sydney,2019-08-02,9
+E03824,R&D,London,2024-10-26,5
+E03854,Operations,Sydney,2022-10-13,4
+E03857,Sales,Toronto,2021-11-15,7
+E03862,Sales,New York,2024-06-14,2
+E03872,IT,London,2024-07-19,3
+E03877,Operations,Toronto,2021-01-22,6
+E03883,Marketing,Singapore,2023-05-15,6
+E03914,Operations,Toronto,2021-01-27,6
+E03915,Sales,Sydney,2024-06-12,3
+E03919,Marketing,Tokyo,2023-11-05,9
+E03921,Marketing,London,2024-02-11,6
+E03933,HR,Sydney,2025-09-03,5
+E03942,Sales,Sydney,2025-11-21,0
+E03947,Sales,Toronto,2023-09-18,9
+E03973,Sales,Berlin,2024-08-31,4
+E03977,Finance,Berlin,2018-07-24,8
+E03985,R&D,New York,2023-01-12,4
+E03986,IT,Tokyo,2019-10-04,8
+E03991,R&D,Singapore,2019-03-28,8
+E03992,Operations,Berlin,2020-09-27,6
+E03994,Finance,New York,2020-04-10,10
+E04029,Finance,New York,2022-07-21,6
+E04033,Finance,Berlin,2022-12-03,9
+E04042,Operations,Toronto,2025-01-21,0
+E04060,Sales,Sydney,2025-04-22,3
+E04070,IT,Sydney,2023-09-23,5
+E04071,R&D,Sydney,2025-05-22,2
+E04096,IT,Singapore,2022-11-23,10
+E04099,IT,Sydney,2022-01-10,7
+E04102,HR,Sydney,2024-12-30,2
+E04106,IT,Tokyo,2025-02-27,1
+E04120,Finance,Berlin,2025-10-12,2
+E04125,Sales,Sydney,2021-08-25,7
+E04127,Operations,New York,2020-08-19,10
+E04130,HR,Tokyo,2022-07-19,7
+E04147,HR,Berlin,2024-03-12,8
+E04150,Sales,Singapore,2019-08-20,7
+E04154,Marketing,Toronto,2024-10-21,5
+E04162,Finance,Sydney,2020-01-22,8
+E04176,R&D,New York,2021-12-15,5
+E04178,HR,Singapore,2025-10-09,7
+E04199,Operations,Singapore,2025-01-28,2
+E04218,IT,Sydney,2018-04-08,10
+E04226,Marketing,Toronto,2024-05-30,3
+E04228,Finance,Berlin,2025-07-11,0
+E04231,Finance,Berlin,2019-05-18,8
+E04235,Finance,Singapore,2022-03-03,8
+E04252,Finance,London,2025-11-18,2
+E04261,Sales,Berlin,2025-01-10,0
+E04264,Sales,Singapore,2023-06-18,4
+E04272,Sales,New York,2025-01-18,0
+E04275,R&D,Toronto,2020-07-06,6
+E04279,IT,New York,2022-03-19,5
+E04281,Finance,Toronto,2024-06-05,8
+E04283,IT,New York,2022-03-09,6
+E04311,IT,Toronto,2025-12-13,9
+E04314,HR,Sydney,2025-06-14,6
+E04315,Operations,London,2021-09-14,5
+E04322,Operations,London,2025-02-23,9
+E04355,HR,London,2019-02-14,9
+E04373,Operations,Singapore,2025-01-03,4
+E04379,IT,Berlin,2023-10-05,3
+E04398,Operations,New York,2018-05-03,9
+E04409,HR,New York,2024-08-09,2
+E04411,HR,Toronto,2023-01-09,4
+E04413,R&D,Tokyo,2022-12-27,4
+E04426,IT,Toronto,2024-11-20,2
+E04444,R&D,London,2020-10-13,8
+E04447,Finance,Toronto,2025-01-16,1
+E04461,HR,New York,2025-07-26,1
+E04464,Marketing,Sydney,2025-04-19,5
+E04466,Sales,Berlin,2024-08-28,5
+E04469,R&D,Singapore,2025-06-10,3
+E04491,Sales,Tokyo,2024-01-18,3
+E04496,Operations,Toronto,2024-10-07,6
+E04503,R&D,New York,2025-03-02,0
+E04512,Sales,Singapore,2025-05-06,5
+E04517,R&D,Toronto,2024-10-29,10
+E04524,Sales,Toronto,2025-01-18,1
+E04525,R&D,Tokyo,2023-06-02,4
+E04526,Sales,Tokyo,2025-09-12,2
+E04528,Sales,London,2025-06-09,1
+E04532,Operations,Tokyo,2022-04-15,5
+E04548,Finance,London,2021-11-13,8
+E04574,Marketing,Tokyo,2025-03-10,2
+E04577,R&D,Singapore,2025-03-17,7
+E04578,HR,Sydney,2025-10-07,3
+E04590,R&D,Sydney,2018-03-16,10
+E04618,Marketing,Sydney,2020-08-14,7
+E04622,Sales,Singapore,2025-08-04,7
+E04626,Finance,New York,2025-11-08,3
+E04637,Marketing,London,2025-12-20,2
+E04647,HR,Singapore,2025-09-12,0
+E04650,HR,Toronto,2021-11-03,9
+E04655,HR,Singapore,2025-11-22,3
+E04662,Operations,New York,2024-09-16,2
+E04671,Operations,Sydney,2021-10-23,8
+E04679,Finance,London,2025-01-26,0
+E04680,Sales,London,2023-05-15,3
+E04686,Operations,London,2019-03-11,7
+E04689,Marketing,Tokyo,2022-08-27,10
+E04703,Operations,Singapore,2024-12-02,9
+E04712,IT,New York,2023-03-02,4
+E04719,Finance,Berlin,2017-03-15,9
+E04735,Marketing,Tokyo,2024-02-19,2
+E04746,Sales,London,2021-01-29,5
+E04756,Finance,Toronto,2022-11-11,6
+E04760,IT,Singapore,2025-10-04,1
+E04766,Operations,Berlin,2019-03-12,9
+E04774,HR,Singapore,2023-12-12,6
+E04782,Finance,New York,2023-06-22,3
+E04788,Finance,Tokyo,2025-08-14,8
+E04794,Operations,Toronto,2020-02-22,10
+E04796,Marketing,Berlin,2020-02-16,6
+E04798,HR,Toronto,2024-05-25,5
+E04802,IT,Berlin,2025-11-05,1
+E04804,R&D,Tokyo,2025-11-24,0
+E04825,Finance,Singapore,2023-04-20,8
+E04826,R&D,Tokyo,2025-09-03,3
+E04831,Marketing,Tokyo,2023-11-23,6
+E04833,HR,Sydney,2025-09-30,10
+E04834,IT,Tokyo,2025-01-18,8
+E04855,IT,New York,2021-12-23,5
+E04862,Finance,Toronto,2024-05-28,6
+E04883,Operations,Singapore,2024-08-10,7
+E04886,Sales,Tokyo,2024-01-22,2
+E04914,Finance,Berlin,2024-03-07,3
+E04919,Finance,Toronto,2020-01-05,7
+E04921,Operations,Toronto,2023-03-10,3
+E04922,Marketing,Tokyo,2024-05-12,3
+E04925,Finance,Singapore,2025-12-10,3
+E04965,Marketing,Tokyo,2023-01-30,9
+E04970,HR,Berlin,2024-12-30,7
+E04980,IT,Sydney,2025-01-28,0
+E04986,R&D,London,2024-08-28,4
+E04987,Finance,New York,2025-11-30,2
+E04991,Marketing,Singapore,2021-11-11,10
+E04993,IT,Toronto,2024-09-26,7
+E04997,R&D,New York,2024-12-10,7
+E05005,R&D,Toronto,2024-06-23,5
+E05013,Operations,Singapore,2025-04-05,8
+E05025,HR,Tokyo,2022-04-25,5
+E05028,Sales,Singapore,2024-05-14,3
+E05057,HR,Berlin,2025-10-30,0
+E05078,HR,Singapore,2024-12-29,6
+E05079,Sales,Toronto,2023-01-10,3
+E05083,HR,Sydney,2024-11-07,4
+E05084,Finance,Tokyo,2025-07-05,1
+E05085,Marketing,Sydney,2024-09-30,5
+E05086,IT,New York,2025-08-21,10
+E05092,R&D,New York,2019-08-06,9
+E05101,Finance,New York,2025-09-12,5
+E05122,Sales,Singapore,2025-11-04,1
+E05126,Sales,Singapore,2022-05-30,5
+E05129,Sales,Toronto,2024-01-05,5
+E05134,Finance,Berlin,2025-09-16,10
+E05139,R&D,London,2024-02-23,2
+E05159,R&D,Toronto,2025-09-22,2
+E05179,Sales,London,2024-02-16,10
+E05218,Marketing,London,2020-03-25,7
+E05235,Operations,London,2025-12-07,1
+E05238,HR,Toronto,2021-05-17,9
+E05245,Finance,New York,2025-03-19,1
+E05263,Finance,Toronto,2024-08-19,2
+E05264,R&D,Singapore,2020-04-28,8
+E05267,Sales,Toronto,2024-11-08,3
+E05272,HR,Tokyo,2025-04-27,1
+E05276,IT,Berlin,2025-05-12,8
+E05279,Finance,New York,2025-06-06,2
+E05285,Marketing,Tokyo,2024-07-16,9
+E05286,R&D,Tokyo,2023-03-12,6
+E05308,Sales,New York,2023-07-16,8
+E05315,R&D,Singapore,2024-03-03,4
+E05320,Marketing,Sydney,2024-03-27,2
+E05336,Marketing,Toronto,2025-05-31,1
+E05343,R&D,Sydney,2025-05-02,0
+E05354,Sales,Berlin,2025-01-14,0
+E05358,R&D,Tokyo,2023-12-03,3
+E05361,IT,Berlin,2024-03-24,5
+E05365,R&D,Sydney,2017-01-15,9
+E05389,HR,Berlin,2025-01-31,1
+E05403,Finance,Singapore,2019-12-15,10
+E05412,Operations,Toronto,2024-11-17,6
+E05414,Sales,New York,2022-12-30,5
+E05427,R&D,New York,2024-03-11,4
+E05444,Finance,Berlin,2024-07-23,4
+E05446,HR,New York,2025-12-28,4
+E05452,IT,Singapore,2025-08-12,10
+E05455,Finance,Tokyo,2025-06-14,0
+E05457,Operations,Toronto,2024-11-05,3
+E05461,Finance,Toronto,2025-08-06,4
+E05470,Marketing,New York,2022-01-10,5
+E05494,Marketing,Toronto,2022-03-26,5
+E05507,Marketing,Tokyo,2023-02-11,5
+E05508,IT,Toronto,2024-02-01,3
+E05520,Operations,Tokyo,2023-03-05,5
+E05529,Operations,Tokyo,2025-01-30,2
+E05537,Sales,Sydney,2024-12-21,9
+E05556,Marketing,Sydney,2024-12-13,2
+E05557,R&D,Toronto,2024-11-28,2
+E05558,IT,Berlin,2024-01-03,7
+E05559,HR,Sydney,2025-02-27,1
+E05561,Operations,Berlin,2022-10-18,4
+E05574,Marketing,New York,2023-08-13,3
+E05577,IT,Berlin,2025-03-30,2
+E05578,HR,Sydney,2025-08-13,0
+E05583,IT,Singapore,2025-06-09,7
+E05585,R&D,Singapore,2018-10-16,10
+E05591,IT,New York,2024-03-23,3
+E05594,Finance,Toronto,2021-09-11,8
+E05598,HR,Singapore,2022-02-28,5
+E05619,Sales,Tokyo,2025-03-19,9
+E05625,Finance,New York,2024-12-14,3
+E05632,Operations,Tokyo,2023-01-26,3
+E05633,R&D,Sydney,2025-09-02,1
+E05639,IT,Berlin,2023-12-24,5
+E05640,Marketing,Singapore,2024-03-13,7
+E05646,Sales,Sydney,2025-02-27,0
+E05647,Operations,Tokyo,2022-10-05,4
+E05665,Finance,London,2020-01-07,6
+E05670,Operations,Sydney,2021-07-28,6
+E05672,Sales,London,2020-12-06,8
+E05678,Finance,Toronto,2019-03-28,8
+E05681,Sales,Tokyo,2023-02-24,4
+E05688,IT,Sydney,2019-03-14,7
+E05692,R&D,Sydney,2023-03-11,6
+E05701,Marketing,Tokyo,2023-06-06,6
+E05722,Marketing,Sydney,2021-01-04,5
+E05731,IT,London,2024-06-18,2
+E05736,IT,Tokyo,2025-12-27,1
+E05743,IT,Tokyo,2025-03-02,1
+E05744,IT,Toronto,2024-08-26,3
+E05748,HR,Sydney,2018-05-10,8
+E05752,R&D,Sydney,2025-04-21,1
+E05757,Finance,Tokyo,2021-10-18,8
+E05764,IT,New York,2025-04-26,0
+E05767,Operations,Toronto,2023-12-24,5
+E05780,IT,Singapore,2024-01-20,3
+E05795,Marketing,Sydney,2025-12-23,4
+E05797,Operations,Berlin,2024-12-13,5
+E05802,Sales,Toronto,2021-04-11,7
+E05804,HR,Berlin,2024-07-02,9
+E05815,Finance,New York,2021-05-11,6
+E05820,Operations,Tokyo,2025-12-09,3
+E05841,Sales,Berlin,2022-08-11,4
+E05863,R&D,Singapore,2025-01-02,5
+E05867,Operations,Toronto,2017-09-16,9
+E05870,HR,New York,2023-07-04,3
+E05872,Marketing,Singapore,2025-03-17,3
+E05878,R&D,Tokyo,2025-08-04,1
+E05887,R&D,Singapore,2021-08-31,7
+E05891,Finance,London,2024-09-11,2
+E05899,HR,Berlin,2025-05-20,0
+E05903,HR,Berlin,2025-03-26,0
+E05906,Sales,Sydney,2023-08-31,8
+E05912,Finance,Tokyo,2025-10-25,0
+E05950,Marketing,Berlin,2021-05-23,9
+E05957,Finance,Berlin,2025-09-10,5
+E05963,Finance,Sydney,2022-03-10,6
+E05970,Sales,Berlin,2024-07-10,3
+E05973,Sales,New York,2025-01-18,0
+E05985,Finance,Tokyo,2025-12-03,0
+E05996,Finance,Singapore,2021-01-24,7
+E06014,HR,Tokyo,2025-03-15,5
+E06017,Sales,Berlin,2025-07-29,7
+E06023,Sales,Sydney,2025-06-18,2
+E06029,R&D,London,2023-11-25,3
+E06030,Operations,Singapore,2021-02-13,7
+E06031,Marketing,London,2023-10-01,4
+E06035,Sales,London,2024-02-07,5
+E06038,Sales,Berlin,2023-12-19,5
+E06047,HR,Berlin,2020-01-16,8
+E06053,Sales,Sydney,2023-07-02,8
+E06054,Operations,Singapore,2023-03-04,4
+E06055,HR,London,2024-03-24,5
+E06060,HR,Tokyo,2025-12-20,7
+E06068,R&D,London,2017-03-02,9
+E06072,Marketing,Sydney,2025-12-29,2
+E06086,HR,Tokyo,2023-05-08,3
+E06089,HR,Tokyo,2024-09-05,3
+E06091,Operations,London,2020-07-31,6
+E06097,Marketing,Sydney,2025-11-05,1
+E06100,Operations,Tokyo,2025-08-11,2
+E06116,Marketing,London,2025-03-24,0
+E06125,Finance,Berlin,2024-01-15,6
+E06128,HR,Tokyo,2017-02-06,9
+E06130,Sales,Singapore,2024-04-03,2
+E06136,Sales,Berlin,2022-05-23,7
+E06145,Marketing,London,2022-01-01,7
+E06147,HR,London,2022-06-08,4
+E06153,IT,London,2023-06-14,4
+E06158,Operations,Toronto,2024-08-31,5
+E06168,IT,Berlin,2020-05-29,7
+E06180,Marketing,London,2025-11-04,0
+E06189,Operations,Berlin,2025-05-09,4
+E06196,Finance,New York,2021-01-28,8
+E06197,Finance,Sydney,2018-07-04,9
+E06201,Finance,Singapore,2025-05-23,2
+E06202,IT,London,2017-11-02,9
+E06213,HR,Singapore,2023-07-21,7
+E06221,R&D,Singapore,2023-08-05,3
+E06251,Operations,Sydney,2022-05-28,4
+E06252,HR,Sydney,2025-08-30,4
+E06258,Operations,Sydney,2025-04-02,10
+E06260,Sales,Sydney,2025-12-12,6
+E06281,Finance,Singapore,2023-12-28,5
+E06289,Marketing,Singapore,2022-07-11,5
+E06296,Operations,London,2025-07-20,8
+E06299,R&D,London,2019-10-11,8
+E06304,Operations,Sydney,2025-02-20,1
+E06309,IT,London,2025-01-17,0
+E06324,Marketing,Sydney,2024-07-01,2
+E06325,Operations,Toronto,2023-08-07,3
+E06331,Operations,Tokyo,2018-09-25,10
+E06343,Operations,Singapore,2021-11-10,8
+E06352,Marketing,Sydney,2019-04-03,10
+E06353,R&D,Berlin,2021-02-03,6
+E06356,Marketing,Sydney,2025-09-03,0
+E06361,HR,London,2021-03-20,7
+E06370,IT,London,2025-09-27,8
+E06385,Finance,Toronto,2023-05-20,3
+E06403,Sales,Berlin,2022-10-14,5
+E06411,HR,Toronto,2023-07-03,6
+E06412,HR,Toronto,2022-04-02,5
+E06415,IT,Sydney,2024-09-18,7
+E06427,Finance,London,2023-10-24,6
+E06435,Marketing,Tokyo,2022-05-10,10
+E06440,Finance,New York,2021-04-04,5
+E06444,Operations,Singapore,2025-12-21,2
+E06446,Finance,Tokyo,2024-04-04,3
+E06459,Marketing,New York,2020-07-22,6
+E06463,IT,New York,2023-11-05,4
+E06464,Marketing,Berlin,2025-05-26,5
+E06471,Operations,New York,2020-01-01,6
+E06472,Operations,New York,2023-09-15,5
+E06485,R&D,Berlin,2024-06-15,4
+E06492,Sales,Sydney,2024-03-22,5
+E06493,Sales,Tokyo,2024-08-30,2
+E06497,Sales,Tokyo,2021-01-27,5
+E06501,Operations,Tokyo,2023-03-28,4
+E06509,IT,London,2025-09-07,8
+E06511,IT,New York,2025-07-25,1
+E06513,Sales,London,2018-04-14,9
+E06534,HR,Tokyo,2024-11-01,8
+E06538,Sales,New York,2025-04-06,0
+E06542,IT,Singapore,2024-05-29,2
+E06548,Finance,Toronto,2024-02-13,2
+E06551,Marketing,Singapore,2025-02-18,5
+E06555,HR,London,2024-11-20,4
+E06569,HR,Sydney,2023-01-17,6
+E06571,IT,New York,2024-10-02,10
+E06572,Sales,New York,2018-02-10,10
+E06586,Operations,London,2023-01-24,4
+E06589,Finance,London,2025-06-06,9
+E06590,Sales,Sydney,2025-05-05,8
+E06594,R&D,New York,2019-05-16,7
+E06598,Marketing,Berlin,2025-11-01,0
+E06599,R&D,New York,2025-12-01,0
+E06606,R&D,London,2016-08-07,10
+E06624,R&D,Tokyo,2023-09-17,5
+E06631,Sales,London,2025-11-02,5
+E06632,IT,New York,2024-03-15,2
+E06644,Finance,Tokyo,2025-02-11,2
+E06645,Finance,New York,2023-08-20,7
+E06677,Marketing,New York,2025-08-05,4
+E06681,Finance,Toronto,2025-12-28,0
+E06684,IT,London,2019-07-03,10
+E06712,Finance,Toronto,2023-03-07,4
+E06717,Finance,New York,2023-09-11,3
+E06727,Finance,Berlin,2025-09-26,1
+E06728,Marketing,Berlin,2022-09-11,7
+E06733,Operations,Tokyo,2025-06-21,1
+E06734,R&D,Berlin,2021-11-21,9
+E06742,Operations,Singapore,2018-11-10,8
+E06744,R&D,New York,2022-11-08,4
+E06746,HR,Berlin,2025-02-19,1
+E06747,Marketing,New York,2023-05-01,3
+E06749,Marketing,Toronto,2024-02-12,6
+E06758,Operations,Sydney,2023-02-09,8
+E06761,R&D,Tokyo,2019-08-19,8
+E06780,R&D,Toronto,2025-08-06,1
+E06818,Finance,Sydney,2025-09-16,0
+E06825,Sales,New York,2024-05-09,6
+E06827,HR,Sydney,2023-08-10,3
+E06834,Marketing,Berlin,2025-06-14,0
+E06857,HR,Sydney,2023-03-05,4
+E06860,R&D,Sydney,2023-10-07,8
+E06865,Finance,Berlin,2025-11-05,0
+E06871,Finance,London,2021-05-21,7
+E06875,Marketing,Berlin,2024-03-21,2
+E06879,IT,London,2024-03-11,2
+E06881,Finance,Berlin,2019-08-26,10
+E06892,R&D,Singapore,2024-06-02,5
+E06902,Finance,Tokyo,2022-05-16,10
+E06907,IT,Tokyo,2021-10-24,8
+E06917,HR,New York,2021-03-28,6
+E06933,Finance,London,2022-09-14,8
+E06953,Marketing,New York,2020-03-13,9
+E06965,IT,New York,2024-07-20,5
+E06972,Sales,Berlin,2022-01-01,10
+E06974,Sales,Singapore,2025-12-30,3
+E06984,Sales,Tokyo,2025-07-12,6
+E06996,Sales,Sydney,2025-11-30,1
+E06999,HR,Toronto,2025-09-13,4
+E07029,HR,Tokyo,2021-01-18,7
+E07040,Marketing,Sydney,2025-05-14,0
+E07048,Sales,Sydney,2025-02-05,7
+E07073,Operations,London,2025-07-07,1
+E07079,IT,Singapore,2025-05-02,0
+E07125,R&D,London,2025-03-13,0
+E07130,Marketing,Tokyo,2020-10-28,8
+E07133,R&D,New York,2023-03-13,4
+E07139,IT,New York,2024-12-02,5
+E07150,Marketing,Tokyo,2020-10-02,6
+E07151,IT,Sydney,2020-04-09,6
+E07156,R&D,Toronto,2023-10-23,5
+E07164,HR,New York,2025-05-11,2
+E07168,R&D,Singapore,2024-01-03,4
+E07185,IT,Singapore,2017-02-06,9
+E07199,Operations,Tokyo,2025-12-15,2
+E07202,IT,London,2021-11-12,10
+E07215,IT,Singapore,2021-11-29,10
+E07223,Marketing,Sydney,2025-11-30,5
+E07229,R&D,Berlin,2025-04-11,8
+E07234,R&D,New York,2023-01-09,3
+E07251,IT,New York,2021-04-14,9
+E07259,Marketing,London,2025-10-18,0
+E07274,Operations,New York,2025-12-22,0
+E07278,R&D,Sydney,2022-08-27,5
+E07281,Operations,New York,2024-10-29,10
+E07283,Finance,Singapore,2025-02-15,5
+E07304,HR,Singapore,2023-08-05,8
+E07336,Finance,Tokyo,2020-03-10,10
+E07341,Marketing,Sydney,2024-09-22,10
+E07350,HR,Toronto,2021-06-24,9
+E07360,R&D,Singapore,2024-11-15,2
+E07364,HR,Berlin,2022-03-09,4
+E07370,Finance,London,2023-03-06,5
+E07403,Marketing,Singapore,2021-11-04,5
+E07414,Operations,Singapore,2020-11-26,7
+E07416,R&D,Toronto,2024-10-22,2
+E07421,Marketing,Toronto,2025-11-29,0
+E07453,Finance,Singapore,2025-02-25,4
+E07485,Sales,New York,2022-06-07,8
+E07486,IT,New York,2024-03-12,7
+E07488,Marketing,London,2022-07-28,8
+E07489,Sales,New York,2022-01-25,5
+E07492,Sales,New York,2019-11-20,7
+E07493,R&D,New York,2020-05-14,10
+E07507,Sales,Tokyo,2023-10-02,3
+E07509,Operations,Tokyo,2025-11-30,0
+E07514,HR,Berlin,2025-01-25,1
+E07525,Marketing,London,2025-07-28,2
+E07533,Operations,Tokyo,2025-10-04,0
+E07538,Operations,Singapore,2019-03-14,8
+E07559,Sales,Toronto,2025-07-26,0
+E07566,Sales,London,2023-06-11,3
+E07575,HR,Tokyo,2024-01-11,2
+E07576,R&D,Berlin,2024-02-03,4
+E07595,Sales,Sydney,2024-09-17,4
+E07604,Operations,Tokyo,2023-07-14,7
+E07608,R&D,Berlin,2025-07-07,2
+E07631,Marketing,New York,2024-02-24,3
+E07633,Operations,Berlin,2023-06-30,10
+E07637,Operations,London,2019-06-22,8
+E07650,Finance,Tokyo,2023-03-26,3
+E07657,Sales,London,2025-04-08,1
+E07661,IT,New York,2025-10-17,10
+E07672,R&D,Berlin,2024-05-24,10
+E07675,Sales,Sydney,2025-12-12,3
+E07677,Marketing,New York,2025-11-14,0
+E07678,Finance,Sydney,2025-07-25,0
+E07682,IT,New York,2023-10-24,5
+E07684,Marketing,Tokyo,2025-07-27,1
+E07694,Marketing,Tokyo,2023-06-11,9
+E07695,Finance,New York,2024-05-14,5
+E07710,Finance,Tokyo,2025-11-02,6
+E07712,Finance,Tokyo,2025-06-28,7
+E07714,Operations,Berlin,2017-10-07,10
+E07715,IT,Singapore,2024-04-07,5
+E07716,HR,Sydney,2024-03-24,2
+E07726,Operations,Berlin,2025-10-18,1
+E07727,Finance,Berlin,2020-04-20,6
+E07730,Operations,Tokyo,2025-07-30,8
+E07731,Finance,Tokyo,2023-01-19,9
+E07733,Marketing,Toronto,2017-07-30,10
+E07741,Marketing,Sydney,2024-02-18,10
+E07756,Operations,London,2023-08-02,3
+E07763,Finance,Singapore,2025-09-06,0
+E07766,HR,Berlin,2023-05-13,3
+E07772,Sales,Sydney,2021-07-14,8
+E07785,R&D,Singapore,2025-10-08,4
+E07788,Operations,Sydney,2025-07-17,0
+E07791,Sales,Berlin,2024-06-12,8
+E07797,Operations,Sydney,2020-08-08,7
+E07798,Sales,Singapore,2022-12-19,4
+E07799,Sales,Sydney,2024-02-09,2
+E07815,HR,London,2021-08-11,9
+E07823,IT,London,2024-10-05,2
+E07830,Sales,London,2025-11-26,2
+E07834,IT,Berlin,2021-05-15,6
+E07852,Operations,New York,2022-04-29,4
+E07863,Sales,London,2023-09-04,3
+E07874,Marketing,Tokyo,2023-11-14,3
+E07886,Operations,Berlin,2016-01-25,10
+E07888,HR,Tokyo,2017-10-31,10
+E07907,R&D,Sydney,2022-01-07,8
+E07910,Sales,Toronto,2025-08-17,1
+E07922,Marketing,Sydney,2024-03-04,3
+E07929,Marketing,London,2024-08-09,3
+E07930,R&D,Toronto,2024-05-10,3
+E07939,Marketing,Sydney,2019-05-20,8
+E07943,Marketing,Singapore,2021-08-18,7
+E07956,Marketing,Tokyo,2025-12-13,0
+E07958,Operations,Tokyo,2025-12-16,1
+E07960,HR,New York,2023-09-25,4
+E07967,Operations,New York,2025-04-06,2
+E07969,IT,Sydney,2022-05-18,9
+E07972,R&D,New York,2016-09-21,10
+E07977,Sales,London,2024-05-03,2
+E07983,IT,Berlin,2020-07-08,10
+E08003,IT,Sydney,2025-06-09,0
+E08005,Finance,Singapore,2025-06-28,5
+E08011,Sales,Sydney,2021-02-22,6
+E08018,Marketing,New York,2023-12-12,8
+E08024,IT,Tokyo,2022-04-19,6
+E08029,Sales,London,2024-06-02,8
+E08040,Marketing,Sydney,2020-06-30,8
+E08041,Marketing,London,2023-05-11,3
+E08042,Marketing,Berlin,2025-10-27,8
+E08067,Sales,Singapore,2021-07-24,8
+E08077,IT,Sydney,2022-01-19,10
+E08078,Finance,Singapore,2025-09-11,1
+E08081,Sales,New York,2022-09-23,8
+E08085,IT,Sydney,2024-11-19,5
+E08100,Finance,Berlin,2025-07-26,1
+E08127,Finance,Berlin,2024-12-27,5
+E08128,IT,Toronto,2025-01-15,0
+E08140,HR,Berlin,2024-02-29,6
+E08150,IT,Berlin,2025-03-07,3
+E08152,Operations,New York,2022-01-23,9
+E08167,Marketing,Sydney,2025-07-29,2
+E08181,Marketing,Toronto,2022-11-16,7
+E08184,Finance,Toronto,2021-08-11,10
+E08186,R&D,Tokyo,2024-03-13,8
+E08191,Finance,Toronto,2025-01-25,0
+E08199,Finance,London,2024-09-26,5
+E08240,Marketing,Tokyo,2025-07-09,5
+E08246,R&D,Berlin,2018-03-21,9
+E08251,R&D,Sydney,2025-08-27,9
+E08252,IT,Singapore,2025-09-04,1
+E08259,Finance,Toronto,2024-11-05,7
+E08267,Finance,Singapore,2025-06-24,5
+E08276,R&D,Tokyo,2023-07-16,5
+E08282,Finance,Singapore,2023-05-10,6
+E08293,IT,Singapore,2022-07-31,4
+E08308,Finance,Singapore,2025-10-14,2
+E08311,R&D,Sydney,2025-10-14,0
+E08312,Marketing,Tokyo,2024-01-15,8
+E08372,Marketing,Berlin,2024-06-16,3
+E08383,Sales,Singapore,2025-06-28,5
+E08403,Operations,Toronto,2023-09-17,3
+E08417,IT,Sydney,2022-05-07,7
+E08424,Sales,New York,2025-11-28,1
+E08426,Operations,Toronto,2017-11-25,9
+E08427,HR,London,2021-07-02,9
+E08428,Sales,London,2025-08-04,0
+E08441,R&D,Sydney,2017-09-15,9
+E08455,Operations,Sydney,2024-12-17,10
+E08485,HR,Singapore,2018-06-26,9
+E08491,Operations,Toronto,2020-05-28,10
+E08499,IT,Tokyo,2024-09-24,2
+E08512,R&D,Singapore,2022-11-05,5
+E08557,Finance,Toronto,2022-02-13,10
+E08561,R&D,London,2023-04-07,9
+E08562,Marketing,Berlin,2023-11-25,3
+E08574,R&D,Sydney,2020-07-02,6
+E08575,Finance,Singapore,2021-02-19,10
+E08577,Operations,London,2023-09-23,5
+E08591,Finance,Berlin,2023-11-14,7
+E08608,Sales,New York,2017-02-04,10
+E08617,Operations,Toronto,2022-04-23,9
+E08622,R&D,London,2022-09-17,6
+E08630,R&D,Toronto,2024-10-10,4
+E08637,Sales,Toronto,2023-03-24,6
+E08638,Operations,Sydney,2023-07-09,5
+E08643,Operations,New York,2024-05-03,3
+E08644,IT,Toronto,2025-02-12,0
+E08646,HR,Berlin,2018-02-09,8
+E08654,Finance,Toronto,2021-06-24,6
+E08660,Sales,Berlin,2025-05-01,2
+E08664,Marketing,London,2023-04-29,8
+E08666,Finance,New York,2023-11-26,6
+E08667,Operations,Toronto,2020-12-17,6
+E08681,IT,London,2025-10-15,9
+E08683,Operations,Tokyo,2025-05-27,1
+E08685,IT,Singapore,2025-11-13,0
+E08687,IT,Tokyo,2024-03-14,6
+E08692,Operations,London,2025-08-07,0
+E08694,IT,Sydney,2025-12-09,1
+E08724,Marketing,New York,2025-12-10,3
+E08726,Marketing,Sydney,2020-07-25,6
+E08728,HR,Berlin,2022-01-31,8
+E08730,HR,New York,2021-05-05,10
+E08732,IT,Toronto,2020-05-16,8
+E08752,Marketing,Toronto,2024-04-04,3
+E08768,R&D,London,2025-08-02,0
+E08769,IT,Singapore,2024-03-07,4
+E08773,Sales,Sydney,2023-03-04,7
+E08780,HR,New York,2025-07-29,9
+E08781,HR,Toronto,2025-01-20,0
+E08787,IT,Berlin,2025-08-04,0
+E08796,HR,London,2021-06-02,6
+E08814,Finance,Singapore,2024-02-23,2
+E08816,Finance,Sydney,2022-09-17,6
+E08865,HR,Toronto,2023-03-13,5
+E08879,Finance,Tokyo,2025-08-21,5
+E08883,Sales,New York,2025-08-24,9
+E08899,Operations,Tokyo,2024-06-28,2
+E08915,HR,Sydney,2020-10-05,7
+E08918,IT,Tokyo,2025-10-15,1
+E08932,R&D,Toronto,2025-01-05,1
+E08946,Sales,London,2024-04-10,3
+E08950,Finance,Sydney,2024-10-13,3
+E08970,Operations,Tokyo,2025-10-07,1
+E08975,Sales,London,2025-07-25,1
+E08976,Marketing,Berlin,2024-12-22,6
+E08979,HR,Toronto,2022-07-15,5
+E08986,IT,Sydney,2022-10-18,6
+E08995,Operations,New York,2024-07-14,8
+E09008,Sales,Tokyo,2025-01-28,0
+E09049,R&D,Berlin,2023-03-23,3
+E09065,Sales,Berlin,2025-12-02,0
+E09066,R&D,Toronto,2023-11-19,6
+E09071,IT,Singapore,2019-12-12,8
+E09074,Finance,London,2019-02-10,10
+E09076,HR,Toronto,2020-07-06,10
+E09085,Finance,Tokyo,2024-12-27,4
+E09094,IT,London,2025-10-21,9
+E09111,HR,London,2025-03-01,0
+E09120,R&D,Berlin,2021-10-05,7
+E09124,R&D,Toronto,2017-10-07,9
+E09126,Operations,Berlin,2025-10-15,9
+E09128,R&D,Tokyo,2021-01-24,9
+E09134,Sales,New York,2019-06-01,7
+E09140,HR,London,2019-12-15,7
+E09142,Sales,Sydney,2018-03-01,9
+E09154,HR,New York,2024-05-31,3
+E09169,Marketing,Berlin,2022-08-19,7
+E09170,IT,Singapore,2025-09-02,0
+E09172,R&D,Toronto,2025-01-03,1
+E09180,R&D,Sydney,2025-04-15,1
+E09181,Operations,Toronto,2025-05-13,0
+E09184,Marketing,Toronto,2024-03-11,10
+E09185,R&D,London,2022-11-22,4
+E09187,Operations,Sydney,2018-08-29,8
+E09203,Sales,Tokyo,2025-06-08,2
+E09205,Sales,Sydney,2025-01-24,3
+E09208,HR,Berlin,2025-04-19,9
+E09222,Sales,Singapore,2018-07-02,9
+E09223,Marketing,Berlin,2020-02-29,7
+E09227,HR,Sydney,2025-07-28,0
+E09233,IT,London,2024-07-31,2
+E09235,Operations,Berlin,2023-06-30,4
+E09239,R&D,Toronto,2021-06-25,9
+E09243,Finance,Berlin,2022-08-05,10
+E09251,IT,Berlin,2022-06-23,8
+E09258,HR,Berlin,2024-06-19,9
+E09261,Operations,Sydney,2022-08-24,8
+E09270,IT,London,2025-03-02,10
+E09271,IT,Singapore,2021-01-27,5
+E09278,R&D,Toronto,2022-08-13,9
+E09280,Marketing,Sydney,2023-03-29,10
+E09290,R&D,Tokyo,2024-06-13,3
+E09293,Operations,Tokyo,2023-08-23,4
+E09302,Operations,Singapore,2025-01-19,1
+E09316,Finance,Berlin,2020-07-27,8
+E09317,Marketing,Tokyo,2018-12-11,10
+E09338,Finance,Singapore,2024-07-28,2
+E09346,Sales,Singapore,2019-09-09,9
+E09356,IT,New York,2025-01-09,5
+E09358,R&D,Sydney,2025-10-29,1
+E09361,HR,Berlin,2024-01-01,4
+E09373,Finance,Toronto,2023-02-18,8
+E09377,Finance,Berlin,2025-06-12,0
+E09378,HR,London,2025-11-15,3
+E09396,Finance,Toronto,2021-03-18,8
+E09398,Sales,Toronto,2017-08-23,10
+E09403,Marketing,Toronto,2025-10-29,6
+E09409,R&D,London,2023-06-01,3
+E09413,Operations,London,2019-03-27,10
+E09415,Finance,Singapore,2022-01-24,5
+E09418,Marketing,Singapore,2019-03-22,8
+E09429,IT,New York,2024-10-10,3
+E09440,R&D,Sydney,2021-12-09,6
+E09450,IT,Toronto,2021-11-09,6
+E09456,HR,Singapore,2021-04-12,8
+E09483,IT,Berlin,2024-12-15,3
+E09502,Marketing,London,2025-03-22,7
+E09506,Operations,Berlin,2023-12-15,3
+E09508,Finance,Berlin,2023-12-10,3
+E09509,IT,London,2019-10-19,8
+E09518,Sales,Tokyo,2025-11-02,2
+E09526,Operations,London,2023-01-03,8
+E09532,HR,New York,2025-02-01,0
+E09541,HR,Sydney,2025-07-03,1
+E09548,Sales,Sydney,2024-08-24,8
+E09554,Operations,Berlin,2021-02-20,8
+E09558,Marketing,New York,2020-02-01,9
+E09560,IT,Sydney,2017-12-04,10
+E09563,HR,Toronto,2021-12-29,6
+E09564,HR,Berlin,2025-09-13,2
+E09568,Sales,Berlin,2023-01-22,7
+E09572,Sales,Berlin,2025-05-21,4
+E09581,Sales,New York,2025-09-28,8
+E09583,R&D,Berlin,2025-09-08,0
+E09604,HR,Toronto,2023-11-30,3
+E09627,Operations,Toronto,2025-06-20,1
+E09637,R&D,New York,2017-12-20,10
+E09639,R&D,Toronto,2021-11-12,6
+E09649,Finance,Singapore,2023-08-18,4
+E09652,Operations,New York,2025-11-03,2
+E09662,HR,Singapore,2024-09-02,2
+E09671,IT,Toronto,2019-04-21,8
+E09672,IT,New York,2022-05-29,10
+E09681,HR,Singapore,2025-06-08,0
+E09698,HR,Sydney,2024-12-04,2
+E09737,Finance,Sydney,2023-03-11,3
+E09742,HR,Berlin,2024-04-29,4
+E09743,R&D,Toronto,2021-08-07,7
+E09754,Sales,Singapore,2025-01-02,0
+E09755,Sales,London,2016-02-08,10
+E09777,HR,London,2025-06-11,0
+E09808,Sales,Berlin,2024-06-22,9
+E09822,Finance,Sydney,2022-05-15,6
+E09828,Finance,London,2023-09-22,4
+E09842,Sales,New York,2025-12-09,0
+E09845,HR,London,2021-07-22,5
+E09859,Operations,Singapore,2024-07-28,2
+E09861,HR,London,2025-10-15,2
+E09876,Marketing,London,2022-05-23,8
+E09884,Operations,Tokyo,2024-07-28,2
+E09886,Marketing,Toronto,2025-04-28,2
+E09887,Sales,London,2025-09-23,1
+E09893,HR,Berlin,2023-01-01,4
+E09907,Finance,New York,2021-05-04,7
+E09914,Sales,Sydney,2023-04-09,9
+E09920,Marketing,Toronto,2025-10-06,1
+E09928,Finance,Tokyo,2025-11-29,1
+E09937,Finance,Berlin,2024-05-02,2
+E09947,Finance,Tokyo,2025-12-24,2
+E09948,R&D,Tokyo,2023-07-15,6
+E09956,HR,Toronto,2022-09-04,5
+E09964,IT,Tokyo,2020-06-12,7
+E09965,Finance,Tokyo,2025-09-09,5
+E09968,Operations,London,2025-11-27,1
+E09969,Operations,New York,2025-03-09,3
+E09974,Operations,Sydney,2025-03-28,9
+E09983,Marketing,Tokyo,2025-06-15,0
