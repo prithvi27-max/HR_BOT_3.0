@@ -1,34 +1,68 @@
-# ml/train_attrition.py
+import pandas as pd
+import joblib
 
-import sys, os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-import pickle
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from ml.preprocess import load_base, preprocess_for_attrition
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, VotingClassifier
+from sklearn.metrics import classification_report
 
-# Load raw dataset
-df = load_base()
+# Load data
+df = pd.read_csv("data/hr_master_10000.csv")
 
-# Prepare training data
-X, y = preprocess_for_attrition(df)
+# Target
+df["Attrition"] = (df["Status"] == "Resigned").astype(int)
 
-# Train-test split
+features = [
+    "Age",
+    "Salary",
+    "Experience_Years",
+    "Engagement_Score",
+    "Performance_Rating"
+]
+
+X = df[features]
+y = df["Attrition"]
+
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
+    X, y, test_size=0.25, random_state=42, stratify=y
 )
 
-# Train model
-model = RandomForestClassifier()
-model.fit(X_train, y_train)
+# Models (Balanced)
+lr = Pipeline([
+    ("scaler", StandardScaler()),
+    ("lr", LogisticRegression(
+        max_iter=1000,
+        class_weight="balanced"
+    ))
+])
 
-# Evaluate baseline
-accuracy = model.score(X_test, y_test)
-print("\n🚀 Attrition Model Training Complete")
-print("📊 Accuracy:", round(accuracy * 100, 2), "%")
+rf = RandomForestClassifier(
+    n_estimators=200,
+    random_state=42,
+    class_weight="balanced"
+)
+
+gb = GradientBoostingClassifier(random_state=42)
+
+ensemble = VotingClassifier(
+    estimators=[
+        ("lr", lr),
+        ("rf", rf),
+        ("gb", gb)
+    ],
+    voting="soft"
+)
+
+ensemble.fit(X_train, y_train)
+
+# Evaluation
+y_pred = ensemble.predict(X_test)
+
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred, zero_division=0))
 
 # Save model
-os.makedirs("models", exist_ok=True)
-pickle.dump(model, open("models/attrition.pkl", "wb"))
-print("💾 Model saved at models/attrition.pkl\n")
+joblib.dump(ensemble, "ml/models/attrition_ensemble.pkl")
+print("✅ Attrition ensemble model saved")
