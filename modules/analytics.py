@@ -1,65 +1,76 @@
 import os
 import pandas as pd
 from sqlalchemy import create_engine
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # ============================
-# CONFIG
+# DATABASE CONNECTION
 # ============================
-CSV_PATH = "data/hr_master_10000.csv"
+DATABASE_URL = os.getenv("SUPABASE_DB_URL")
 
-# DATABASE_URL will be set only in LOCAL or CLOUD DB
-DB_URL = os.getenv("DATABASE_URL")
-
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=1800
+)
 
 # ============================
-# DATA LOADER
+# LOAD MASTER DATA
 # ============================
 def load_master():
     """
-    Loads HR master data.
-    Priority:
-    1. Cloud / Local Database (if DATABASE_URL exists)
-    2. CSV fallback (Streamlit-safe)
+    Load HR master data from Supabase Postgres
     """
+    query = "SELECT * FROM hr_master"
+    df = pd.read_sql(query, engine)
 
-    if DB_URL:
-        try:
-            engine = create_engine(DB_URL)
-            df = pd.read_sql("SELECT * FROM hr_master", engine)
-            return df
-        except Exception as e:
-            print("⚠ Database unavailable, using CSV:", e)
+    # Convert date columns safely
+    if "hire_date" in df.columns:
+        df["hire_date"] = pd.to_datetime(df["hire_date"], errors="coerce")
+        df["hire_year"] = df["hire_date"].dt.year
 
-    # Safe fallback
-    return pd.read_csv(CSV_PATH)
+    return df
 
 
 # ============================
-# HR METRICS
+# BASIC HR METRICS
 # ============================
 def headcount(df):
-    return df[df["Status"] == "Active"].shape[0]
+    return df[df["status"] == "Active"].shape[0]
 
 
 def attrition_rate(df):
     total = len(df)
-    resigned = df[df["Status"] == "Resigned"].shape[0]
+    resigned = df[df["status"] == "Resigned"].shape[0]
     return round((resigned / total) * 100, 2)
 
 
 def avg_salary(df, group=None):
-    if group and group in df.columns:
-        return df.groupby(group)["Salary"].mean().round(2).to_dict()
-    return round(df["Salary"].mean(), 2)
+    if group and group.lower() in df.columns:
+        return (
+            df.groupby(group.lower())["salary"]
+            .mean()
+            .round(2)
+            .to_dict()
+        )
+    return round(df["salary"].mean(), 2)
 
 
 def gender_mix(df):
-    return df["Gender"].value_counts(normalize=True).round(2).to_dict()
+    return (
+        df["gender"]
+        .value_counts(normalize=True)
+        .round(2)
+        .to_dict()
+    )
 
 
 def engagement_stats(df):
     return {
-        "mean_engagement": round(df["Engagement_Score"].mean(), 2),
-        "high_engagement": round((df["Engagement_Score"] > 80).mean(), 2),
-        "low_engagement": round((df["Engagement_Score"] < 50).mean(), 2),
+        "mean_engagement": round(df["engagement_score"].mean(), 2),
+        "high_engagement": round((df["engagement_score"] > 80).mean(), 2),
+        "low_engagement": round((df["engagement_score"] < 50).mean(), 2),
     }
