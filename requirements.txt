@@ -13,8 +13,7 @@ groq==0.5.0
 # ML
 scikit-learn>=1.4.1.post1
 joblib>=1.4.0
-statsmodels>=0.14.1
-prophet>=1.1.5
+
 
 # Database / ORM (🔥 REQUIRED FOR YOUR ERROR)
 sqlalchemy>=2.0.0

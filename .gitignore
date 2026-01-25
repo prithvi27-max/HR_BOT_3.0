@@ -2,15 +2,9 @@
 __pycache__/
 *.pyc
 
-# Environment
+# Virtual environments
+venv/
 .env
-
-# ML models (can be versioned later if needed)
-ml/models/*.pkl
-
-# Streamlit cache
-.streamlit/
 
 # OS files
 .DS_Store
-Thumbs.db
