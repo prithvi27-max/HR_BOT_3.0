@@ -3,114 +3,133 @@ import plotly.express as px
 
 
 # =========================================================
-# Required dataset formatting (matching your CSV columns)
+# NLU → DATAFRAME COLUMN MAPPING
+# =========================================================
+DIMENSION_COLUMN_MAP = {
+    "DEPARTMENT": "Department",
+    "LOCATION": "Location",
+    "GENDER": "Gender",
+    "YEAR": "Hire_Year",
+    "MONTH": "Hire_Month"
+}
+
+
+# =========================================================
+# DATE NORMALIZATION (SAFE)
 # =========================================================
 def ensure_date_and_year(df):
-    df["Hire_Date"] = pd.to_datetime(df["Hire_Date"], errors="coerce", dayfirst=True)
-    df["Hire_Year"] = df["Hire_Date"].dt.year
+    if "Hire_Date" in df.columns:
+        df["Hire_Date"] = pd.to_datetime(
+            df["Hire_Date"], errors="coerce", dayfirst=True
+        )
+        df["Hire_Year"] = df["Hire_Date"].dt.year
+        df["Hire_Month"] = df["Hire_Date"].dt.month
     return df
 
 
 # =========================================================
-# SINGLE METRIC GROUPED CHARTS
+# GROUPED METRICS (BAR / PIE)
 # =========================================================
 def compute_metric(df, metric, dimension):
     df = ensure_date_and_year(df)
 
-    # Headcount grouped
-    if metric == "headcount" and dimension:
-        return df.groupby(dimension)["Employee_ID"].count()
+    if not dimension:
+        return None
 
-    # Salary grouped
-    if metric == "salary" and dimension:
-        return df.groupby(dimension)["Salary"].mean()
+    # 🔑 Map NLU dimension → dataframe column
+    column = DIMENSION_COLUMN_MAP.get(dimension)
 
-    # Gender grouped
-    if metric == "gender" and dimension:
-        return df.groupby(dimension)["Employee_ID"].count()
+    if column is None or column not in df.columns:
+        return None
+
+    # ---------------------------
+    # HEADCOUNT
+    # ---------------------------
+    if metric == "headcount":
+        return df.groupby(column)["Employee_ID"].count()
+
+    # ---------------------------
+    # SALARY
+    # ---------------------------
+    if metric == "salary":
+        return df.groupby(column)["Salary"].mean().round(2)
+
+    # ---------------------------
+    # GENDER DISTRIBUTION
+    # ---------------------------
+    if metric == "gender":
+        return df.groupby(column)["Employee_ID"].count()
+
+    # ---------------------------
+    # ATTRITION %
+    # ---------------------------
+    if metric == "attrition":
+        df["Attrition_Flag"] = (df["Status"] == "Resigned").astype(int)
+        return (df.groupby(column)["Attrition_Flag"].mean() * 100).round(2)
 
     return None
 
 
 # =========================================================
-# TREND METRIC COMPUTATION
+# TREND METRICS (LINE)
 # =========================================================
 def compute_trend_metric(df, metric):
-    # Normalize and extract year
-    df["Hire_Date"] = pd.to_datetime(df["Hire_Date"], errors="coerce", dayfirst=True)
-    df["Hire_Year"] = df["Hire_Date"].dt.year
+    df = ensure_date_and_year(df)
 
-    # Drop rows where year is missing
+    if "Hire_Year" not in df.columns:
+        return None
+
     df = df.dropna(subset=["Hire_Year"])
 
-    # HEADCOUNT TREND
     if metric == "headcount":
         return df.groupby("Hire_Year")["Employee_ID"].count()
 
-    # ATTRITION TREND
     if metric == "attrition":
-        # Create numeric flag from Status
-        df["Attrition_Flag"] = df["Status"].replace({"Resigned": 1, "Active": 0})
+        df["Attrition_Flag"] = (df["Status"] == "Resigned").astype(int)
+        return (df.groupby("Hire_Year")["Attrition_Flag"].mean() * 100).round(2)
 
-        # Force numeric
-        df["Attrition_Flag"] = pd.to_numeric(df["Attrition_Flag"], errors="coerce").fillna(0)
-
-        # Compute percentage
-        trend = df.groupby("Hire_Year")["Attrition_Flag"].mean() * 100
-        return trend
-
-    # SALARY TREND
     if metric == "salary":
-        return df.groupby("Hire_Year")["Salary"].mean()
+        return df.groupby("Hire_Year")["Salary"].mean().round(2)
 
     return None
 
 
-
 # =========================================================
-# CHART BUILDING
+# CHART RENDERING
 # =========================================================
 def build_chart(data, metric, chart_type):
     if data is None or len(data) == 0:
         return None
 
-    index = data.index
-    values = data.values
+    df_plot = data.reset_index()
+    x_col = df_plot.columns[0]
+    y_col = df_plot.columns[1]
 
-    # 📊 Pie chart
-    if chart_type == "pie":
+    metric_title = metric.replace("_", " ").title()
+
+    if chart_type.upper() == "PIE":
         return px.pie(
-            names=index,
-            values=values,
-            title=f"{metric.title()} Breakdown"
+            df_plot,
+            names=x_col,
+            values=y_col,
+            title=f"{metric_title} Distribution"
         )
 
-    # 📉 Histogram (salary distribution)
-    if chart_type == "hist":
-        return px.histogram(
-            x=values,
-            nbins=10,
-            title=f"{metric.title()} Distribution"
-        )
-
-    # 📊 Bar
-    if chart_type == "bar":
-        return px.bar(
-            x=index,
-            y=values,
-            title=f"{metric.title()} by Group",
-            text_auto=True
-        )
-
-    # 📈 Line (trend)
-    if chart_type == "line":
+    if chart_type.upper() == "LINE":
         fig = px.line(
-            x=index,
-            y=values,
-            title=f"{metric.title()} Trend by Year"
+            df_plot,
+            x=x_col,
+            y=y_col,
+            title=f"{metric_title} Trend"
         )
         fig.update_traces(mode="lines+markers")
         return fig
 
-    # Default → Bar
-    return px.bar(x=index, y=values, title=f"{metric.title()} chart")
+    # Default BAR
+    return px.bar(
+        df_plot,
+        x=x_col,
+        y=y_col,
+        title=f"{metric_title} by {x_col}",
+        text_auto=True
+    )

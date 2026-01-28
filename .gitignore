@@ -11,3 +11,20 @@ venv/
 
 # ML models
 ml/models/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual env
+venv/
+.env
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+# ML models (optional but recommended)
+ml/models/*.pkl
+
+# OS files
+.DS_Store

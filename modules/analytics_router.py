@@ -1,136 +1,131 @@
 import streamlit as st
+
 from modules.analytics import load_master
 from modules.llm_engine import call_llm
+
 from modules.nlu import (
     detect_intent,
     extract_metric,
     extract_dimension,
     extract_chart_type
 )
+
 from modules.charts import (
     compute_metric,
     compute_trend_metric,
     build_chart
 )
+
 from modules.domain_guard import classify_domain
 
-
-# -------------------------------------------------
-# LLM Explanation Helper
-# -------------------------------------------------
-def llm_explain(text, language="en"):
-    prompt = f"""
-    You are an HR analytics expert.
-
-    Explain the following insight briefly for HR leaders
-    in ONE short paragraph.
-
-    Insight:
-    {text}
-
-    Respond in {language}.
-    """
-    return call_llm(prompt, language)
+# 🆕 Advanced analytics helpers
+from modules.filter_extractor import extract_filters
+from modules.time_extractor import extract_time_window
+from modules.comparison_extractor import extract_comparison
+from modules.chart_selector import auto_chart
 
 
-# -------------------------------------------------
+# ==================================================
+# SESSION CONTEXT INITIALIZATION
+# ==================================================
+if "context" not in st.session_state:
+    st.session_state.context = {
+        "metric": None,
+        "dimension": None,
+        "intent": None
+    }
+
+
+# ==================================================
 # MAIN ROUTER
-# -------------------------------------------------
+# ==================================================
 def process_query(query, language="en"):
+
+    # ---------------- LOAD DATA ----------------
     df = load_master()
 
-    # -------------------------------------------------
-    # 1️⃣ DOMAIN GUARD (LLM-based, SAFE)
-    # -------------------------------------------------
+    # ---------------- DOMAIN ROUTING ----------------
     domain_result = classify_domain(query)
+    domain = domain_result.get("domain", "HR")
 
-    if not domain_result or not isinstance(domain_result, dict):
-        domain = "UNKNOWN"
-    else:
-        domain = domain_result.get("domain", "UNKNOWN")
-
+    # If not HR → behave like ChatGPT (text only)
     if domain != "HR":
-        return "🚫 This assistant is restricted to HR-related questions only."
+        return call_llm(query, language)
 
-    # -------------------------------------------------
-    # 2️⃣ INTENT DETECTION
-    # -------------------------------------------------
+    # ---------------- INTENT ----------------
     intent_result = detect_intent(query)
+    intent = intent_result.get("intent", "GENERAL")
 
-    if not intent_result or not isinstance(intent_result, dict):
-        intent = "GENERAL"
-    else:
-        intent = intent_result.get("intent", "GENERAL")
+    st.session_state.context["intent"] = intent
 
-    # -------------------------------------------------
-    # 3️⃣ DEFINITIONS (Pure LLM)
-    # -------------------------------------------------
+    # ---------------- DEFINITIONS ----------------
     if intent == "DEFINITION":
         return call_llm(query, language)
 
-    # -------------------------------------------------
-    # 4️⃣ CHART REQUESTS
-    # -------------------------------------------------
+    # ---------------- HR ANALYTICS / CHARTS ----------------
     if intent == "CHART":
-        metric = extract_metric(query)
-        dimension = extract_dimension(query)
-        chart_type = extract_chart_type(query)
 
-        if metric is None:
+        # -------- Core NLU extraction --------
+        metric = extract_metric(query) or st.session_state.context.get("metric")
+        dimension = extract_dimension(query) or st.session_state.context.get("dimension")
+
+        if not metric:
             return "❓ Please specify a metric like headcount, attrition, salary, or gender."
 
-        # ---- TREND CHART ----
-        if any(k in query.lower() for k in ["trend", "over time", "by year", "yearly"]):
+        # -------- Advanced HR logic --------
+        filters = extract_filters(query)              # Region, Gender, Dept, etc.
+        time_window = extract_time_window(query)      # last year, last 3 years
+        comparison = extract_comparison(query)        # A vs B (future use)
+
+        # -------- Persist conversational memory --------
+        st.session_state.context.update({
+            "metric": metric,
+            "dimension": dimension
+        })
+
+        # ---------------- TREND ANALYSIS ----------------
+        if any(k in query.lower() for k in [
+            "trend", "over time", "year", "yearly", "monthly"
+        ]):
+
             data = compute_trend_metric(df, metric)
 
-            if data is None:
-                return "⚠ Trend analysis is not available for this metric yet."
+            if data is None or len(data) == 0:
+                return "⚠ Trend analysis is not available for this metric."
 
             fig = build_chart(data, metric, "LINE")
             st.plotly_chart(fig, use_container_width=True)
-
-            st.download_button(
-                "📥 Download Trend CSV",
-                data.reset_index().to_csv(index=False),
-                f"{metric}_trend.csv",
-                "text/csv"
-            )
             return None
 
-        # ---- NORMAL BREAKDOWN CHART ----
-        data = compute_metric(df, metric, dimension)
+        # ---------------- STANDARD / FILTERED ANALYSIS ----------------
+        data = compute_metric(
+            df=df,
+            metric=metric,
+            dimension=dimension,
+            filters=filters
+        )
 
-        if data is None:
-            return "⚠ No breakdown available. Try: headcount by department or salary by location."
+        if data is None or len(data) == 0:
+            return "⚠ No data found for the selected criteria."
 
+        chart_type = auto_chart(metric, dimension)
         fig = build_chart(data, metric, chart_type)
         st.plotly_chart(fig, use_container_width=True)
-
-        st.download_button(
-            "📥 Download CSV",
-            data.reset_index().to_csv(index=False),
-            f"{metric}_chart.csv",
-            "text/csv"
-        )
         return None
 
-    # -------------------------------------------------
-    # 5️⃣ ML PREDICTION PLACEHOLDER
-    # -------------------------------------------------
+    # ---------------- ML PREDICTION ----------------
     if intent == "ML_PREDICT":
         return "🤖 Attrition risk prediction is enabled. Please select an employee or department."
 
-    # -------------------------------------------------
-    # 6️⃣ FALLBACK (LLM, HR-ONLY)
-    # -------------------------------------------------
+    # ---------------- FALLBACK (SAFE HR LLM) ----------------
     safe_prompt = f"""
-    You are an HR analytics assistant.
-    Answer ONLY using HR concepts and workforce analytics.
-    If the question is unrelated to HR, politely refuse.
+You are an HR analytics assistant.
+Answer ONLY using HR concepts and workforce analytics.
+If the question is unrelated to HR, politely refuse.
 
-    Question:
-    {query}
+Question:
+{query}
 
-    Respond in {language}.
-    """
+Respond in {language}.
+"""
     return call_llm(safe_prompt, language)
