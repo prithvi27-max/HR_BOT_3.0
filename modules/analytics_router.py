@@ -2,102 +2,61 @@ import streamlit as st
 
 from modules.analytics import load_master
 from modules.llm_engine import call_llm
-
-from modules.nlu import (
-    detect_intent,
-    extract_metric,
-    extract_dimension,
-    extract_chart_type
-)
-
-from modules.charts import (
-    compute_metric,
-    compute_trend_metric,
-    build_chart
-)
-
+from modules.nlu import detect_intent, extract_metric, extract_dimension
+from modules.charts import compute_metric, compute_trend_metric, build_chart
 from modules.domain_guard import classify_domain
-
-# 🆕 Advanced analytics helpers
 from modules.filter_extractor import extract_filters
-from modules.time_extractor import extract_time_window
-from modules.comparison_extractor import extract_comparison
-from modules.chart_selector import auto_chart
 
-
-# ==================================================
-# SESSION CONTEXT INITIALIZATION
-# ==================================================
-if "context" not in st.session_state:
-    st.session_state.context = {
-        "metric": None,
-        "dimension": None,
-        "intent": None
-    }
-
-
-# ==================================================
-# MAIN ROUTER
-# ==================================================
+# =================================================
+# FINAL ROUTER (NO HALLUCINATION, NO CRASH)
+# =================================================
 def process_query(query, language="en"):
 
-    # ---------------- LOAD DATA ----------------
+    # -------- Session init (CRITICAL) --------
+    if "context" not in st.session_state:
+        st.session_state.context = {
+            "metric": None,
+            "dimension": None
+        }
+
     df = load_master()
 
-    # ---------------- DOMAIN ROUTING ----------------
-    domain_result = classify_domain(query)
-    domain = domain_result.get("domain", "HR")
-
-    # If not HR → behave like ChatGPT (text only)
-    if domain != "HR":
+    # -------- Domain guard --------
+    if classify_domain(query).get("domain") != "HR":
         return call_llm(query, language)
 
-    # ---------------- INTENT ----------------
-    intent_result = detect_intent(query)
-    intent = intent_result.get("intent", "GENERAL")
+    # -------- Intent --------
+    intent = detect_intent(query).get("intent")
 
-    st.session_state.context["intent"] = intent
-
-    # ---------------- DEFINITIONS ----------------
+    # -------- Definitions --------
     if intent == "DEFINITION":
         return call_llm(query, language)
 
-    # ---------------- HR ANALYTICS / CHARTS ----------------
+    # -------- Charts / Analytics --------
     if intent == "CHART":
 
-        # -------- Core NLU extraction --------
-        metric = extract_metric(query) or st.session_state.context.get("metric")
-        dimension = extract_dimension(query) or st.session_state.context.get("dimension")
+        metric = extract_metric(query) or st.session_state.context["metric"]
+        dimension = extract_dimension(query) or st.session_state.context["dimension"]
+        filters = extract_filters(query)
 
         if not metric:
-            return "❓ Please specify a metric like headcount, attrition, salary, or gender."
+            return "❓ Please specify a metric like headcount or salary."
 
-        # -------- Advanced HR logic --------
-        filters = extract_filters(query)              # Region, Gender, Dept, etc.
-        time_window = extract_time_window(query)      # last year, last 3 years
-        comparison = extract_comparison(query)        # A vs B (future use)
-
-        # -------- Persist conversational memory --------
         st.session_state.context.update({
             "metric": metric,
             "dimension": dimension
         })
 
-        # ---------------- TREND ANALYSIS ----------------
-        if any(k in query.lower() for k in [
-            "trend", "over time", "year", "yearly", "monthly"
-        ]):
-
+        # ---- Trend ----
+        if any(w in query.lower() for w in ["trend", "over time", "year"]):
             data = compute_trend_metric(df, metric)
-
-            if data is None or len(data) == 0:
-                return "⚠ Trend analysis is not available for this metric."
-
+            if data is None:
+                return "⚠ Trend not available."
             fig = build_chart(data, metric, "LINE")
             st.plotly_chart(fig, use_container_width=True)
             return None
 
-        # ---------------- STANDARD / FILTERED ANALYSIS ----------------
+        # ---- Normal chart ----
         data = compute_metric(
             df=df,
             metric=metric,
@@ -105,27 +64,19 @@ def process_query(query, language="en"):
             filters=filters
         )
 
-        if data is None or len(data) == 0:
-            return "⚠ No data found for the selected criteria."
+        if data is None:
+            return "⚠ Unable to compute this metric from HR data."
 
-        chart_type = auto_chart(metric, dimension)
-        fig = build_chart(data, metric, chart_type)
+        fig = build_chart(data, metric, "BAR")
         st.plotly_chart(fig, use_container_width=True)
         return None
 
-    # ---------------- ML PREDICTION ----------------
-    if intent == "ML_PREDICT":
-        return "🤖 Attrition risk prediction is enabled. Please select an employee or department."
+    # -------- HARD BLOCK hallucinated metrics --------
+    if extract_metric(query):
+        return (
+            "⚠ I can only provide HR metrics based on actual data. "
+            "Please refine your request."
+        )
 
-    # ---------------- FALLBACK (SAFE HR LLM) ----------------
-    safe_prompt = f"""
-You are an HR analytics assistant.
-Answer ONLY using HR concepts and workforce analytics.
-If the question is unrelated to HR, politely refuse.
-
-Question:
-{query}
-
-Respond in {language}.
-"""
-    return call_llm(safe_prompt, language)
+    # -------- Safe fallback --------
+    return call_llm(query, language)
