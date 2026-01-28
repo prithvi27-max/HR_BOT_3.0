@@ -1,9 +1,9 @@
 import pandas as pd
 import plotly.express as px
 
-# -----------------------------
+# ----------------------------------
 # Dimension → Column mapping
-# -----------------------------
+# ----------------------------------
 DIMENSION_COLUMN_MAP = {
     "DEPARTMENT": "Department",
     "LOCATION": "Location",
@@ -11,18 +11,18 @@ DIMENSION_COLUMN_MAP = {
     "YEAR": "Hire_Year"
 }
 
-# -----------------------------
+# ----------------------------------
 # Date normalization
-# -----------------------------
+# ----------------------------------
 def ensure_date_and_year(df):
     if "Hire_Date" in df.columns:
         df["Hire_Date"] = pd.to_datetime(df["Hire_Date"], errors="coerce")
         df["Hire_Year"] = df["Hire_Date"].dt.year
     return df
 
-# -----------------------------
+# ----------------------------------
 # Safe filter application
-# -----------------------------
+# ----------------------------------
 def apply_filters(df, filters):
     if not filters:
         return df
@@ -35,9 +35,9 @@ def apply_filters(df, filters):
 
     return df
 
-# =================================================
-# FINAL compute_metric (DO NOT CHANGE SIGNATURE)
-# =================================================
+# ==================================================
+# FINAL compute_metric (ONE TRUE SIGNATURE)
+# ==================================================
 def compute_metric(df, metric, dimension, filters=None):
     df = ensure_date_and_year(df)
     df = apply_filters(df, filters)
@@ -64,9 +64,9 @@ def compute_metric(df, metric, dimension, filters=None):
 
     return None
 
-# -----------------------------
-# Trend metrics
-# -----------------------------
+# ----------------------------------
+# Trend metrics (ONLY when asked)
+# ----------------------------------
 def compute_trend_metric(df, metric):
     df = ensure_date_and_year(df)
 
@@ -85,10 +85,10 @@ def compute_trend_metric(df, metric):
 
     return None
 
-# -----------------------------
-# Chart builder
-# -----------------------------
-def build_chart(data, metric, chart_type):
+# ----------------------------------
+# Chart builder (ONLY when requested)
+# ----------------------------------
+def build_chart(data, chart_type):
     if data is None or len(data) == 0:
         return None
 
@@ -98,4 +98,8 @@ def build_chart(data, metric, chart_type):
     if chart_type == "LINE":
         return px.line(df_plot, x=x, y=y, markers=True)
 
+    if chart_type == "PIE":
+        return px.pie(df_plot, names=x, values=y)
+
+    # Default BAR
     return px.bar(df_plot, x=x, y=y, text_auto=True)

@@ -2,17 +2,18 @@ import streamlit as st
 
 from modules.analytics import load_master
 from modules.llm_engine import call_llm
-from modules.nlu import detect_intent, extract_metric, extract_dimension
+from modules.nlu import extract_metric, extract_dimension
 from modules.charts import compute_metric, compute_trend_metric, build_chart
 from modules.domain_guard import classify_domain
 from modules.filter_extractor import extract_filters
 
-# =================================================
-# FINAL ROUTER (NO HALLUCINATION, NO CRASH)
-# =================================================
+
+# ==================================================
+# FINAL ANALYTICS ROUTER (LOCKED)
+# ==================================================
 def process_query(query, language="en"):
 
-    # -------- Session init (CRITICAL) --------
+    # ---------------- SESSION INIT ----------------
     if "context" not in st.session_state:
         st.session_state.context = {
             "metric": None,
@@ -20,63 +21,87 @@ def process_query(query, language="en"):
         }
 
     df = load_master()
+    q = query.lower()
 
-    # -------- Domain guard --------
+    # ---------------- DOMAIN GUARD ----------------
     if classify_domain(query).get("domain") != "HR":
         return call_llm(query, language)
 
-    # -------- Intent --------
-    intent = detect_intent(query).get("intent")
+    # ---------------- OUTPUT PREFERENCE ----------------
+    output_type = "table"   # DEFAULT
+    chart_type = None
 
-    # -------- Definitions --------
-    if intent == "DEFINITION":
+    if "chart" in q or "graph" in q:
+        output_type = "chart"
+        if "bar" in q:
+            chart_type = "BAR"
+        elif "line" in q or "trend" in q:
+            chart_type = "LINE"
+        elif "pie" in q:
+            chart_type = "PIE"
+
+    if any(k in q for k in ["excel", "csv", "extract", "download"]):
+        output_type = "excel"
+
+    # ---------------- METRIC EXTRACTION ----------------
+    metric = extract_metric(query) or st.session_state.context.get("metric")
+    dimension = extract_dimension(query) or st.session_state.context.get("dimension")
+    filters = extract_filters(query)
+
+    if not metric:
+        # Non-metric HR question → LLM allowed
         return call_llm(query, language)
 
-    # -------- Charts / Analytics --------
-    if intent == "CHART":
+    # Save conversational context
+    st.session_state.context.update({
+        "metric": metric,
+        "dimension": dimension
+    })
 
-        metric = extract_metric(query) or st.session_state.context["metric"]
-        dimension = extract_dimension(query) or st.session_state.context["dimension"]
-        filters = extract_filters(query)
-
-        if not metric:
-            return "❓ Please specify a metric like headcount or salary."
-
-        st.session_state.context.update({
-            "metric": metric,
-            "dimension": dimension
-        })
-
-        # ---- Trend ----
-        if any(w in query.lower() for w in ["trend", "over time", "year"]):
-            data = compute_trend_metric(df, metric)
-            if data is None:
-                return "⚠ Trend not available."
-            fig = build_chart(data, metric, "LINE")
-            st.plotly_chart(fig, use_container_width=True)
-            return None
-
-        # ---- Normal chart ----
-        data = compute_metric(
-            df=df,
-            metric=metric,
-            dimension=dimension,
-            filters=filters
-        )
-
+    # ---------------- TREND (ONLY WHEN ASKED) ----------------
+    if output_type == "chart" and chart_type == "LINE":
+        data = compute_trend_metric(df, metric)
         if data is None:
-            return "⚠ Unable to compute this metric from HR data."
-
-        fig = build_chart(data, metric, "BAR")
+            return "⚠ Trend analysis not available for this metric."
+        fig = build_chart(data, "LINE")
         st.plotly_chart(fig, use_container_width=True)
         return None
 
-    # -------- HARD BLOCK hallucinated metrics --------
-    if extract_metric(query):
-        return (
-            "⚠ I can only provide HR metrics based on actual data. "
-            "Please refine your request."
-        )
+    # ---------------- COMPUTE DATA ONCE ----------------
+    data = compute_metric(
+        df=df,
+        metric=metric,
+        dimension=dimension,
+        filters=filters
+    )
 
-    # -------- Safe fallback --------
-    return call_llm(query, language)
+    if data is None or len(data) == 0:
+        return "⚠ No data found for the selected criteria."
+
+    result_df = data.reset_index()
+
+    # ---------------- DEFAULT: TABLE ----------------
+    if output_type == "table":
+        st.dataframe(result_df, use_container_width=True)
+        return None
+
+    # ---------------- EXCEL / CSV ----------------
+    if output_type == "excel":
+        csv = result_df.to_csv(index=False)
+        st.download_button(
+            "📥 Download CSV",
+            csv,
+            f"{metric}_by_{dimension}.csv",
+            "text/csv"
+        )
+        return None
+
+    # ---------------- CHART (ONLY IF TYPE GIVEN) ----------------
+    if output_type == "chart":
+
+        if not chart_type:
+            return "❓ Please specify the chart type (bar, line, pie)."
+
+        fig = build_chart(data, chart_type)
+        st.plotly_chart(fig, use_container_width=True)
+        return None
