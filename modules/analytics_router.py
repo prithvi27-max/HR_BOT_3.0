@@ -2,7 +2,7 @@ import pandas as pd
 from plotly.graph_objs import Figure
 
 # ===============================
-# INTERNAL IMPORTS (MATCH analytics.py)
+# IMPORTS THAT ACTUALLY EXIST
 # ===============================
 from modules.analytics import (
     load_master,
@@ -31,7 +31,6 @@ from modules.analytics import (
 )
 
 from modules.nlu import (
-    detect_intent,
     extract_metric,
     extract_dimension,
     extract_chart_type
@@ -77,16 +76,15 @@ def process_query(query: str, language: str = "en"):
         return "⚠ HR dataset is empty."
 
     # ===============================
-    # 3️⃣ INTENT & EXTRACTION
+    # 3️⃣ EXTRACT SIGNALS (NO detect_intent)
     # ===============================
-    intent = detect_intent(query).get("intent")
     metric = extract_metric(query)
     dimension = extract_dimension(query)
     chart_type = extract_chart_type(query)
 
-    wants_chart = intent == "CHART"
-    wants_definition = intent == "DEFINITION"
-    wants_forecast = intent == "FORECAST" or "predict" in q
+    wants_chart = any(k in q for k in ["chart", "plot", "graph", "bar", "pie", "line"])
+    wants_definition = any(k in q for k in ["what is", "define", "explain", "meaning"])
+    wants_forecast = any(k in q for k in ["predict", "forecast", "risk", "probability"])
 
     # ===============================
     # 4️⃣ DEFINITIONS → LLM
@@ -101,18 +99,16 @@ def process_query(query: str, language: str = "en"):
 
         # TOTAL HEADCOUNT
         if "total" in q:
-            value = total_headcount(df)
             return pd.DataFrame({
                 "Metric": ["Total Headcount"],
-                "Value": [value]
+                "Value": [total_headcount(df)]
             })
 
-        # ACTIVE HEADCOUNT (default)
+        # ACTIVE HEADCOUNT (DEFAULT)
         if not dimension:
-            value = active_headcount(df)
             return pd.DataFrame({
                 "Metric": ["Active Headcount"],
-                "Value": [value]
+                "Value": [active_headcount(df)]
             })
 
         # HEADCOUNT BY YEAR
@@ -147,10 +143,9 @@ def process_query(query: str, language: str = "en"):
 
         # OVERALL ATTRITION RATE
         if not dimension:
-            value = attrition_rate(df)
             return pd.DataFrame({
                 "Metric": ["Attrition Rate (%)"],
-                "Value": [value]
+                "Value": [attrition_rate(df)]
             })
 
         # ATTRITION BY YEAR
@@ -184,10 +179,9 @@ def process_query(query: str, language: str = "en"):
     if metric == "salary":
 
         if not dimension:
-            value = average_salary(df)
             return pd.DataFrame({
                 "Metric": ["Average Salary"],
-                "Value": [value]
+                "Value": [average_salary(df)]
             })
 
         column_map = {
@@ -212,10 +206,9 @@ def process_query(query: str, language: str = "en"):
     if metric == "engagement":
 
         if not dimension:
-            value = average_engagement(df)
             return pd.DataFrame({
                 "Metric": ["Average Engagement Score"],
-                "Value": [value]
+                "Value": [average_engagement(df)]
             })
 
         column_map = {
@@ -251,7 +244,11 @@ def process_query(query: str, language: str = "en"):
     if wants_forecast:
         try:
             pred_df = predict_attrition(df)
-            return pred_df.sort_values("Attrition_Risk", ascending=False).head(20)
+            return (
+                pred_df
+                .sort_values("Attrition_Risk", ascending=False)
+                .head(20)
+            )
         except Exception:
             return "⚠ Unable to run attrition prediction model."
 
