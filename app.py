@@ -1,7 +1,5 @@
 import streamlit as st
 from plotly.graph_objs import Figure
-
-from modules.analytics_router import process_query
 from config import APP_NAME, DEFAULT_LANGUAGE
 
 
