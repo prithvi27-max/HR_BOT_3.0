@@ -1,22 +1,23 @@
 import streamlit as st
+import pandas as pd
 from plotly.graph_objs import Figure
 
+from config import APP_NAME
 from modules.analytics_router import process_query
-from config import APP_NAME, DEFAULT_LANGUAGE
 
 
-# ==========================
-# Page Config
-# ==========================
+# ==================================================
+# PAGE CONFIG
+# ==================================================
 st.set_page_config(
     page_title=APP_NAME,
     layout="wide",
     page_icon="🤖"
 )
 
-# ==========================
-# Language Map
-# ==========================
+# ==================================================
+# LANGUAGE MAP
+# ==================================================
 LANG_MAP = {
     "English": "en",
     "German": "de",
@@ -25,17 +26,14 @@ LANG_MAP = {
     "Italian": "it"
 }
 
-# ==========================
-# Sidebar
-# ==========================
+# ==================================================
+# SIDEBAR
+# ==================================================
 with st.sidebar:
     st.title("HR-GPT 3.0")
     st.caption("Multilingual HR Analytics Assistant")
 
-    selected_lang = st.selectbox(
-        "🌍 Language",
-        list(LANG_MAP.keys())
-    )
+    selected_lang = st.selectbox("🌍 Language", list(LANG_MAP.keys()))
     lang_code = LANG_MAP[selected_lang]
 
     st.markdown("---")
@@ -44,32 +42,16 @@ with st.sidebar:
         st.session_state.messages = []
 
     st.markdown("---")
-    st.markdown("### 🧾 Chat History")
-
-    if "messages" in st.session_state:
-        for msg in st.session_state.messages:
-            if msg["role"] == "user":
-                st.markdown(f"• {msg['content'][:40]}")
-
-    st.markdown("---")
     st.info("🔒 This assistant answers HR-related questions only.")
 
-# ==========================
-# Title
-# ==========================
-TITLE_MAP = {
-    "en": "HR-GPT 3.0: Multilingual AI-Powered HR Analytics Assistant",
-    "de": "HR-GPT 3.0: Mehrsprachiger KI-HR-Analyseassistent",
-    "fr": "HR-GPT 3.0 : Assistant RH multilingue alimenté par l’IA",
-    "es": "HR-GPT 3.0: Asistente multilingüe de análisis de RRHH con IA",
-    "it": "HR-GPT 3.0: Assistente multilingue di analisi HR basato sull’IA"
-}
+# ==================================================
+# TITLE
+# ==================================================
+st.title("HR-GPT 3.0: Multilingual AI-Powered HR Analytics Assistant")
 
-st.title(TITLE_MAP.get(lang_code, TITLE_MAP["en"]))
-
-# ==========================
-# Chat State
-# ==========================
+# ==================================================
+# CHAT STATE
+# ==================================================
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -80,35 +62,68 @@ def add_message(role, content):
         "content": content
     })
 
-# ==========================
-# Display Chat Messages
-# ==========================
+
+# ==================================================
+# DISPLAY CHAT HISTORY
+# ==================================================
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
+        if isinstance(msg["content"], str):
+            st.markdown(msg["content"])
+        else:
+            st.write(msg["content"])
 
-# ==========================
-# Chat Input
-# ==========================
+
+# ==================================================
+# USER INPUT
+# ==================================================
 user_query = st.chat_input(
     "Ask about headcount, attrition, salary, engagement, or HR concepts..."
 )
 
 if user_query:
+    # USER MESSAGE
     add_message("user", user_query)
     with st.chat_message("user"):
         st.markdown(user_query)
 
+    # ASSISTANT RESPONSE
     response = process_query(user_query, lang_code)
 
-    if isinstance(response, Figure):
-        with st.chat_message("assistant"):
+    with st.chat_message("assistant"):
+
+        # ---------------------------
+        # CASE 1: CHART
+        # ---------------------------
+        if isinstance(response, Figure):
             st.markdown("📊 **Here’s the chart you requested**")
             st.plotly_chart(response, use_container_width=True)
-        add_message("assistant", "[Chart generated]")
+            add_message("assistant", "[Chart generated]")
 
-    elif response is not None:
-        with st.chat_message("assistant"):
+        # ---------------------------
+        # CASE 2: TABLE (DataFrame)
+        # ---------------------------
+        elif isinstance(response, pd.DataFrame):
+            st.dataframe(response, use_container_width=True)
+            add_message("assistant", "[Table displayed]")
+
+        # ---------------------------
+        # CASE 3: KPI (int / float)
+        # ---------------------------
+        elif isinstance(response, (int, float)):
+            st.metric(label="Result", value=response)
+            add_message("assistant", f"Result: {response}")
+
+        # ---------------------------
+        # CASE 4: TEXT (LLM / fallback)
+        # ---------------------------
+        elif isinstance(response, str):
             st.markdown(response)
-    add_message("assistant", response)
+            add_message("assistant", response)
 
+        # ---------------------------
+        # CASE 5: NOTHING / ERROR
+        # ---------------------------
+        else:
+            st.warning("⚠️ Unable to process this request with available data.")
+            add_message("assistant", "⚠️ Unable to process this request.")
