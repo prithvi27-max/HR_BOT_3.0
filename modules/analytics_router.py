@@ -52,11 +52,12 @@ def process_query(query, language="en"):
     if "line" in q or "trend" in q:
         chart_type = "LINE"
 
-    # --------------------------------------------------
-    # DEFINITIONS / CONCEPTS
-    # --------------------------------------------------
-    if q_type in ["DEFINITION", "EXPLANATION"]:
-        return call_llm(query, language)
+    # ==================================================
+# 2️⃣ DEFINITIONS / CONCEPTUAL QUESTIONS
+# ==================================================
+if any(k in q for k in ["what is", "define", "explain", "meaning"]):
+    return call_llm(query, language)
+
 
     # ==================================================
     # 3️⃣ ANALYTICS (DETERMINISTIC)
