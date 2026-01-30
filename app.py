@@ -1,5 +1,7 @@
 import streamlit as st
 from plotly.graph_objs import Figure
+
+from modules.analytics_router import process_query
 from config import APP_NAME, DEFAULT_LANGUAGE
 
 
@@ -38,7 +40,6 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # New Chat
     if st.button("🆕 New Chat"):
         st.session_state.messages = []
 
@@ -52,7 +53,6 @@ with st.sidebar:
 
     st.markdown("---")
     st.info("🔒 This assistant answers HR-related questions only.")
-
 
 # ==========================
 # Title
@@ -80,14 +80,12 @@ def add_message(role, content):
         "content": content
     })
 
-
 # ==========================
 # Display Chat Messages
 # ==========================
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
-
 
 # ==========================
 # Chat Input
@@ -97,27 +95,19 @@ user_query = st.chat_input(
 )
 
 if user_query:
-    # User message
     add_message("user", user_query)
     with st.chat_message("user"):
         st.markdown(user_query)
 
-    # Assistant response
     response = process_query(user_query, lang_code)
 
-    # CASE 1: Chart returned
     if isinstance(response, Figure):
         with st.chat_message("assistant"):
             st.markdown("📊 **Here’s the chart you requested**")
             st.plotly_chart(response, use_container_width=True)
         add_message("assistant", "[Chart generated]")
 
-    # CASE 2: Text response
     elif response is not None:
         with st.chat_message("assistant"):
             st.markdown(response)
         add_message("assistant", response)
-
-    # CASE 3: response is None → UI already rendered (table / metric)
-    else:
-        pass

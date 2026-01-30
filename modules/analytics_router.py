@@ -1,132 +1,105 @@
-# modules/analytics_router.py
-
-import streamlit as st
-
-# -------------------- Analytics --------------------
-from modules.analytics import (
-    load_master,
-    active_headcount,
-    total_headcount,
-    active_headcount_by,
-    active_headcount_by_year,
-    attrition_count,
-    attrition_rate,
-    attrition_rate_by,
-    attrition_by_year,
-    average_salary,
-    average_salary_by,
-    average_engagement,
-    engagement_by,
-    gender_distribution
-)
-
-# -------------------- ML --------------------
-from ml.predict import predict_attrition
-
-# -------------------- UI --------------------
-from modules.charts import build_chart, render_table
-
-# -------------------- NLU + LLM --------------------
-from modules.nlu import extract_metric, extract_dimension
+from modules.analytics import load_master
+from modules.domain_guard import classify_domain
+from modules.nlu import extract_metric, extract_dimension, extract_chart_type
+from modules.charts import render_table, build_chart
 from modules.llm_engine import call_llm
-from modules.nlu import extract_metric, extract_dimension
 
-# ML (will be used next step)
-# from ml.predict import predict_attrition
+import pandas as pd
 
 
-# ==================================================
-# MAIN ROUTER
-# ==================================================
 def process_query(query, language="en"):
-    df = load_master()
     q = query.lower()
 
-    metric = extract_metric(query)
-    dimension = extract_dimension(query)
+    # Load data
+    df = load_master()
 
-    wants_chart = any(k in q for k in ["chart", "plot", "graph"])
-    chart_type = "BAR"
-    if "pie" in q:
-        chart_type = "PIE"
-    if "line" in q or "trend" in q:
-        chart_type = "LINE"
+    # ---------------- DOMAIN GUARD ----------------
+    domain_result = classify_domain(query)
+    if domain_result.get("domain") != "HR":
+        return "🚫 This assistant is restricted to HR-related questions only."
 
-    # ==================================================
-# 2️⃣ DEFINITIONS / CONCEPTUAL QUESTIONS
-# ==================================================
-if any(k in q for k in ["what is", "define", "explain", "meaning"]):
-    return call_llm(query, language)
-
-
-    # ==================================================
-    # 3️⃣ ANALYTICS (DETERMINISTIC)
-    # ==================================================
-    data = None
-
-    # ---------------- HEADCOUNT ----------------
-    if metric == "headcount":
-
-        if "total" in q and "active" not in q:
-            data = total_headcount(df)
-
-        elif dimension == "YEAR":
-            data = active_headcount_by_year(df)
-
-        elif dimension:
-            data = active_headcount_by(df, dimension)
-
-        else:
-            data = active_headcount(df)
-
-    # ---------------- ATTRITION ----------------
-    elif metric == "attrition":
-
-        if "rate" in q and dimension:
-            data = attrition_rate_by(df, dimension)
-
-        elif "rate" in q:
-            data = attrition_rate(df)
-
-        elif dimension == "YEAR":
-            data = attrition_by_year(df)
-
-        else:
-            data = attrition_count(df)
-
-    # ---------------- SALARY ----------------
-    elif metric == "salary":
-        data = average_salary_by(df, dimension) if dimension else average_salary(df)
-
-    # ---------------- ENGAGEMENT ----------------
-    elif metric == "engagement":
-        data = engagement_by(df, dimension) if dimension else average_engagement(df)
-
-    # ---------------- DIVERSITY ----------------
-    elif metric == "gender":
-        data = gender_distribution(df)
-
-    # ---------------- FALLBACK ----------------
-    else:
+    # ---------------- DEFINITIONS ----------------
+    if any(k in q for k in ["what is", "define", "explain", "meaning"]):
         return call_llm(query, language)
 
+    # ---------------- METRIC EXTRACTION ----------------
+    metric = extract_metric(query)
+    dimension = extract_dimension(query)
+    chart_type = extract_chart_type(query)
+
+    if not metric:
+        return "⚠ Please specify an HR metric like headcount or attrition."
+
     # ==================================================
-    # 4️⃣ OUTPUT HANDLING
+    # HEADCOUNT LOGIC
     # ==================================================
-    if data is None:
-        return "⚠ Unable to compute this metric."
+    if metric == "headcount":
 
-    # Scalar KPI
-    if isinstance(data, (int, float)):
-        st.metric(label=query.capitalize(), value=data)
-        return None
+        # TOTAL HEADCOUNT
+        if "total" in q and "active" not in q:
+            total = df["Employee_ID"].nunique()
+            return f"👥 **Total Headcount:** {total}"
 
-    # Table (default)
-    if not wants_chart:
-        st.dataframe(render_table(data), use_container_width=True)
-        return None
+        # ACTIVE HEADCOUNT
+        if "active" in q:
+            active = df[df["Status"] == "Active"]["Employee_ID"].nunique()
+            return f"👥 **Active Headcount:** {active}"
 
-    # Chart (explicit)
-    fig = build_chart(data, chart_type)
-    st.plotly_chart(fig, use_container_width=True)
-    return None
+        # HEADCOUNT BY DIMENSION
+        if dimension:
+            column_map = {
+                "DEPARTMENT": "Department",
+                "GENDER": "Gender",
+                "LOCATION": "Location",
+                "YEAR": "Hire_Year"
+            }
+
+            col = column_map.get(dimension)
+            if col not in df.columns:
+                return "⚠ Requested breakdown not available."
+
+            if col == "Hire_Year" and "Hire_Date" in df.columns:
+                df["Hire_Year"] = pd.to_datetime(df["Hire_Date"], errors="coerce").dt.year
+
+            data = df.groupby(col)["Employee_ID"].nunique()
+
+            if "chart" in q or "bar" in q or "pie" in q or "line" in q:
+                fig = build_chart(data, chart_type)
+                return fig
+
+            return render_table(data)
+
+    # ==================================================
+    # ATTRITION LOGIC
+    # ==================================================
+    if metric == "attrition":
+        df["_attr"] = (df["Status"] == "Resigned").astype(int)
+
+        if dimension:
+            column_map = {
+                "DEPARTMENT": "Department",
+                "GENDER": "Gender",
+                "LOCATION": "Location",
+                "YEAR": "Hire_Year"
+            }
+
+            col = column_map.get(dimension)
+            if col not in df.columns:
+                return "⚠ Requested breakdown not available."
+
+            if col == "Hire_Year" and "Hire_Date" in df.columns:
+                df["Hire_Year"] = pd.to_datetime(df["Hire_Date"], errors="coerce").dt.year
+
+            data = (df.groupby(col)["_attr"].mean() * 100).round(2)
+
+            if "chart" in q or "bar" in q or "pie" in q or "line" in q:
+                fig = build_chart(data, chart_type)
+                return fig
+
+            return render_table(data)
+
+        # OVERALL ATTRITION
+        rate = round(df["_attr"].mean() * 100, 2)
+        return f"📉 **Overall Attrition Rate:** {rate}%"
+
+    return "⚠ Unable to compute this metric with available data."
