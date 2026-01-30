@@ -1,67 +1,67 @@
+# modules/analytics_router.py
+
 import pandas as pd
 from plotly.graph_objs import Figure
 
 # ===============================
-# IMPORTS
+# ANALYTICS
 # ===============================
 from modules.analytics import (
     load_master,
 
-    # Headcount
     active_headcount,
     total_headcount,
     active_headcount_by,
     active_headcount_by_year,
 
-    # Attrition
     attrition_rate,
     attrition_rate_by,
     attrition_by_year,
 
-    # Salary
     average_salary,
     average_salary_by,
 
-    # Engagement
     average_engagement,
     engagement_by,
 
-    # Diversity
     gender_distribution
 )
 
-from modules.nlu import (
-    extract_metric,
-    extract_dimension,
-    extract_chart_type
-)
-
+# ===============================
+# NLU + CHARTS
+# ===============================
+from modules.nlu import extract_metric, extract_dimension, extract_chart_type
 from modules.charts import build_chart
 from modules.llm_engine import call_llm
 
+# ===============================
 # ML
+# ===============================
 from ml.predict import predict_attrition
+from ml.evaluate import load_ml_metrics
+from ml.interpret import get_feature_importance
+from ml.predict import add_risk_bucket
 
 
 # ======================================================
 # MAIN ROUTER
 # ======================================================
 def process_query(query: str, language: str = "en"):
-
     q = query.lower().strip()
 
     # ===============================
     # 1️⃣ GREETINGS
     # ===============================
-    if q in ["hi", "hello", "hey", "hii", "good morning", "good evening"]:
+    if q in ["hi", "hello", "hey", "hii"]:
         return (
             "👋 **Hi! I’m HR-GPT 3.0**\n\n"
             "You can ask me:\n"
-            "- Total or active headcount\n"
+            "- Total / active headcount\n"
             "- Headcount by department / year\n"
             "- Attrition rate & trends\n"
             "- Salary & engagement analysis\n"
-            "- 🔮 Predict attrition risk (ML)"
+            "- Predict employee attrition risk\n"
+            "- ML model performance"
         )
 
     # ===============================
@@ -69,45 +69,30 @@ def process_query(query: str, language: str = "en"):
     # ===============================
     try:
         df = load_master()
-    except Exception:
+    except Exception as e:
         return "⚠ Unable to load HR data."
 
     if df is None or df.empty:
         return "⚠ HR dataset is empty."
 
     # ===============================
-    # 3️⃣ SIGNAL EXTRACTION
+    # 3️⃣ EXTRACT INTENT SIGNALS
     # ===============================
     metric = extract_metric(query)
     dimension = extract_dimension(query)
     chart_type = extract_chart_type(query)
 
     wants_chart = any(k in q for k in ["chart", "plot", "graph", "bar", "pie", "line"])
-    wants_definition = any(k in q for k in ["what is", "define", "explain", "meaning"])
-    wants_forecast = any(k in q for k in [
-        "predict", "prediction", "risk", "probability",
-        "chance", "likelihood", "who will leave"
-    ])
+    wants_definition = any(k in q for k in ["what is", "define", "explain"])
+    wants_prediction = any(k in q for k in ["predict", "risk", "likely to leave"])
+    wants_model_metrics = any(k in q for k in ["model performance", "auc", "precision", "recall"])
+    wants_feature_importance = any(k in q for k in ["feature importance", "why attrition", "drivers"])
 
     # ===============================
     # 4️⃣ DEFINITIONS → LLM
     # ===============================
     if wants_definition:
         return call_llm(query, language)
-
-    # ==================================================
-    # 🔟 ML ATTRITION PREDICTION (🔥 MUST COME EARLY 🔥)
-    # ==================================================
-    if wants_forecast:
-        try:
-            pred_df = predict_attrition(df)
-            return (
-                pred_df
-                .sort_values("Attrition_Risk", ascending=False)
-                .head(20)
-            )
-        except Exception as e:
-            return "⚠ Unable to run attrition prediction model."
 
     # ===============================
     # 5️⃣ HEADCOUNT
@@ -135,8 +120,6 @@ def process_query(query: str, language: str = "en"):
                 "GENDER": "Gender"
             }
             col = column_map.get(dimension)
-            if not col:
-                return "⚠ Unsupported headcount breakdown."
             data = active_headcount_by(df, col)
 
         if wants_chart:
@@ -145,7 +128,7 @@ def process_query(query: str, language: str = "en"):
         return data.reset_index(name="Headcount")
 
     # ===============================
-    # 6️⃣ ATTRITION (DESCRIPTIVE)
+    # 6️⃣ ATTRITION
     # ===============================
     if metric == "attrition":
 
@@ -164,8 +147,6 @@ def process_query(query: str, language: str = "en"):
                 "GENDER": "Gender"
             }
             col = column_map.get(dimension)
-            if not col:
-                return "⚠ Unsupported attrition breakdown."
             data = attrition_rate_by(df, col)
 
         if wants_chart:
@@ -184,14 +165,11 @@ def process_query(query: str, language: str = "en"):
                 "Value": [average_salary(df)]
             })
 
-        column_map = {
+        col = {
             "DEPARTMENT": "Department",
             "LOCATION": "Location",
             "GENDER": "Gender"
-        }
-        col = column_map.get(dimension)
-        if not col:
-            return "⚠ Unsupported salary breakdown."
+        }.get(dimension)
 
         data = average_salary_by(df, col)
 
@@ -211,14 +189,11 @@ def process_query(query: str, language: str = "en"):
                 "Value": [average_engagement(df)]
             })
 
-        column_map = {
+        col = {
             "DEPARTMENT": "Department",
             "LOCATION": "Location",
             "GENDER": "Gender"
-        }
-        col = column_map.get(dimension)
-        if not col:
-            return "⚠ Unsupported engagement breakdown."
+        }.get(dimension)
 
         data = engagement_by(df, col)
 
@@ -239,6 +214,33 @@ def process_query(query: str, language: str = "en"):
         return data.reset_index(name="Count")
 
     # ===============================
-    # 1️⃣1️⃣ FALLBACK → LLM
+    # 🔟 ML ATTRITION PREDICTION
+    # ===============================
+    if wants_prediction:
+        pred_df = predict_attrition(df)
+        pred_df = add_risk_bucket(pred_df)
+
+        return (
+            pred_df
+            .sort_values("Attrition_Risk", ascending=False)
+            .head(20)
+        )
+
+    # ===============================
+    # 1️⃣1️⃣ FEATURE IMPORTANCE
+    # ===============================
+    if wants_feature_importance:
+        return get_feature_importance().reset_index(
+            name="Importance"
+        ).rename(columns={"index": "Feature"})
+
+    # ===============================
+    # 1️⃣2️⃣ MODEL PERFORMANCE
+    # ===============================
+    if wants_model_metrics:
+        return load_ml_metrics()
+
+    # ===============================
+    # 1️⃣3️⃣ FALLBACK → LLM
     # ===============================
     return call_llm(query, language)
