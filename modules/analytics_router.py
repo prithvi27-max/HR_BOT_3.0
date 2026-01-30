@@ -15,7 +15,6 @@ from modules.charts import build_chart, render_table
 from modules.question_pool import classify_question
 from modules.llm_engine import call_llm
 from modules.nlu import extract_metric, extract_dimension
-from modules.filter_extractor import extract_filters
 
 # ML (will be used next step)
 # from ml.predict import predict_attrition
@@ -60,7 +59,6 @@ Question:
     # ==================================================
     metric = extract_metric(query)
     dimension = extract_dimension(query)
-    filters = extract_filters(query)
 
     if not metric:
         return call_llm(query, language)
