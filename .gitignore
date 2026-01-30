@@ -24,7 +24,7 @@ venv/
 .streamlit/secrets.toml
 
 # ML models (optional but recommended)
-ml/models/*.pkl
+#ml/models/*.pkl
 
 # OS files
 .DS_Store
