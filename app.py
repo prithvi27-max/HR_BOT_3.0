@@ -40,16 +40,15 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # 🆕 New Chat Button
+    # New Chat
     if st.button("🆕 New Chat"):
         st.session_state.messages = []
 
     st.markdown("---")
     st.markdown("### 🧾 Chat History")
 
-    # Show compact history
     if "messages" in st.session_state:
-        for i, msg in enumerate(st.session_state.messages):
+        for msg in st.session_state.messages:
             if msg["role"] == "user":
                 st.markdown(f"• {msg['content'][:40]}")
 
@@ -58,7 +57,7 @@ with st.sidebar:
 
 
 # ==========================
-# Multilingual Title
+# Title
 # ==========================
 TITLE_MAP = {
     "en": "HR-GPT 3.0: Multilingual AI-Powered HR Analytics Assistant",
@@ -69,7 +68,6 @@ TITLE_MAP = {
 }
 
 st.title(TITLE_MAP.get(lang_code, TITLE_MAP["en"]))
-
 
 # ==========================
 # Chat State
@@ -97,7 +95,7 @@ for msg in st.session_state.messages:
 # Chat Input
 # ==========================
 user_query = st.chat_input(
-    "Ask about headcount, attrition trends, charts, or HR concepts..."
+    "Ask about headcount, attrition, salary, engagement, or HR concepts..."
 )
 
 if user_query:
@@ -109,15 +107,19 @@ if user_query:
     # Assistant response
     response = process_query(user_query, lang_code)
 
-    # Chart or Text
+    # CASE 1: Chart returned
     if isinstance(response, Figure):
         with st.chat_message("assistant"):
             st.markdown("📊 **Here’s the chart you requested**")
             st.plotly_chart(response, use_container_width=True)
-
         add_message("assistant", "[Chart generated]")
 
-    else:
-        add_message("assistant", response)
+    # CASE 2: Text response
+    elif response is not None:
         with st.chat_message("assistant"):
             st.markdown(response)
+        add_message("assistant", response)
+
+    # CASE 3: response is None → UI already rendered (table / metric)
+    else:
+        pass
