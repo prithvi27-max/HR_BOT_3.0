@@ -1,20 +1,35 @@
-import streamlit as st
 import pandas as pd
 from plotly.graph_objs import Figure
 
 # ===============================
-# INTERNAL IMPORTS (SAFE ONLY)
+# INTERNAL IMPORTS (MATCH analytics.py)
 # ===============================
 from modules.analytics import (
     load_master,
-    headcount,
+
+    # Headcount
+    active_headcount,
+    total_headcount,
+    active_headcount_by,
+    active_headcount_by_year,
+
+    # Attrition
     attrition_rate,
-    yearly_headcount,
-    yearly_attrition,
-    group_count
+    attrition_rate_by,
+    attrition_by_year,
+
+    # Salary
+    average_salary,
+    average_salary_by,
+
+    # Engagement
+    average_engagement,
+    engagement_by,
+
+    # Diversity
+    gender_distribution
 )
 
-from modules.charts import build_chart, render_table
 from modules.nlu import (
     detect_intent,
     extract_metric,
@@ -22,6 +37,7 @@ from modules.nlu import (
     extract_chart_type
 )
 
+from modules.charts import build_chart
 from modules.llm_engine import call_llm
 
 # ML
@@ -32,20 +48,21 @@ from ml.attrition_model import predict_attrition
 # MAIN ROUTER
 # ======================================================
 def process_query(query: str, language: str = "en"):
-    query_l = query.lower().strip()
+    q = query.lower().strip()
 
     # ===============================
-    # 1️⃣ GREETINGS (UX FIX)
+    # 1️⃣ GREETINGS
     # ===============================
-    if query_l in ["hi", "hello", "hey", "hii", "good morning", "good evening"]:
+    if q in ["hi", "hello", "hey", "hii", "good morning", "good evening"]:
         return (
             "👋 **Hi! I’m HR-GPT 3.0**\n\n"
-            "You can ask me things like:\n"
+            "You can ask me:\n"
             "- Total headcount\n"
+            "- Active headcount\n"
             "- Headcount by department\n"
             "- Attrition rate by year\n"
-            "- Salary analysis\n"
-            "- HR definitions (e.g. *What is attrition?*)"
+            "- Salary or engagement analysis\n"
+            "- Predict attrition risk"
         )
 
     # ===============================
@@ -53,25 +70,23 @@ def process_query(query: str, language: str = "en"):
     # ===============================
     try:
         df = load_master()
-    except Exception as e:
+    except Exception:
         return "⚠ Unable to load HR data."
 
-    if df is None or len(df) == 0:
+    if df is None or df.empty:
         return "⚠ HR dataset is empty."
 
     # ===============================
-    # 3️⃣ INTENT DETECTION
+    # 3️⃣ INTENT & EXTRACTION
     # ===============================
-    intent_info = detect_intent(query)
-    intent = intent_info.get("intent")
-
+    intent = detect_intent(query).get("intent")
     metric = extract_metric(query)
     dimension = extract_dimension(query)
     chart_type = extract_chart_type(query)
 
     wants_chart = intent == "CHART"
-    wants_forecast = intent == "FORECAST"
     wants_definition = intent == "DEFINITION"
+    wants_forecast = intent == "FORECAST" or "predict" in q
 
     # ===============================
     # 4️⃣ DEFINITIONS → LLM
@@ -80,83 +95,164 @@ def process_query(query: str, language: str = "en"):
         return call_llm(query, language)
 
     # ===============================
-    # 5️⃣ TOTAL HEADCOUNT
+    # 5️⃣ HEADCOUNT
     # ===============================
-    if metric == "headcount" and not dimension:
-        total = headcount(df)
-        table = pd.DataFrame({
-            "Metric": ["Total Active Headcount"],
-            "Value": [total]
-        })
-        st.dataframe(table, use_container_width=True)
-        return None
+    if metric == "headcount":
 
-    # ===============================
-    # 6️⃣ GROUPED HEADCOUNT
-    # ===============================
-    if metric == "headcount" and dimension:
-        data = group_count(df, dimension)
+        # TOTAL HEADCOUNT
+        if "total" in q:
+            value = total_headcount(df)
+            return pd.DataFrame({
+                "Metric": ["Total Headcount"],
+                "Value": [value]
+            })
 
-        if data is None:
-            return "⚠ Unable to compute headcount for this dimension."
+        # ACTIVE HEADCOUNT (default)
+        if not dimension:
+            value = active_headcount(df)
+            return pd.DataFrame({
+                "Metric": ["Active Headcount"],
+                "Value": [value]
+            })
+
+        # HEADCOUNT BY YEAR
+        if dimension == "YEAR":
+            data = active_headcount_by_year(df)
+
+        # HEADCOUNT BY OTHER DIMENSIONS
+        else:
+            column_map = {
+                "DEPARTMENT": "Department",
+                "LOCATION": "Location",
+                "GENDER": "Gender"
+            }
+            col = column_map.get(dimension)
+            if not col:
+                return "⚠ Unsupported headcount breakdown."
+
+            data = active_headcount_by(df, col)
+
+        if data is None or data.empty:
+            return "⚠ Unable to compute headcount."
 
         if wants_chart:
-            fig = build_chart(data, chart_type)
-            return fig
+            return build_chart(data, chart_type)
 
-        st.dataframe(render_table(data), use_container_width=True)
-        return None
+        return data.reset_index(name="Headcount")
 
     # ===============================
-    # 7️⃣ ATTRITION RATE
+    # 6️⃣ ATTRITION
     # ===============================
-    if metric == "attrition" and not dimension:
-        rate = attrition_rate(df)
-        table = pd.DataFrame({
-            "Metric": ["Overall Attrition Rate (%)"],
-            "Value": [rate]
-        })
-        st.dataframe(table, use_container_width=True)
-        return None
+    if metric == "attrition":
 
-    # ===============================
-    # 8️⃣ ATTRITION BY YEAR
-    # ===============================
-    if metric == "attrition" and dimension == "YEAR":
-        data = yearly_attrition(df)
+        # OVERALL ATTRITION RATE
+        if not dimension:
+            value = attrition_rate(df)
+            return pd.DataFrame({
+                "Metric": ["Attrition Rate (%)"],
+                "Value": [value]
+            })
+
+        # ATTRITION BY YEAR
+        if dimension == "YEAR":
+            data = attrition_by_year(df)
+
+        # ATTRITION BY DIMENSION
+        else:
+            column_map = {
+                "DEPARTMENT": "Department",
+                "LOCATION": "Location",
+                "GENDER": "Gender"
+            }
+            col = column_map.get(dimension)
+            if not col:
+                return "⚠ Unsupported attrition breakdown."
+
+            data = attrition_rate_by(df, col)
+
+        if data is None or data.empty:
+            return "⚠ Unable to compute attrition."
 
         if wants_chart:
-            fig = build_chart(data, chart_type)
-            return fig
+            return build_chart(data, chart_type)
 
-        st.dataframe(render_table(data), use_container_width=True)
-        return None
+        return data.reset_index(name="Attrition Rate")
 
     # ===============================
-    # 9️⃣ HEADCOUNT BY YEAR
+    # 7️⃣ SALARY
     # ===============================
-    if metric == "headcount" and dimension == "YEAR":
-        data = yearly_headcount(df)
+    if metric == "salary":
+
+        if not dimension:
+            value = average_salary(df)
+            return pd.DataFrame({
+                "Metric": ["Average Salary"],
+                "Value": [value]
+            })
+
+        column_map = {
+            "DEPARTMENT": "Department",
+            "LOCATION": "Location",
+            "GENDER": "Gender"
+        }
+        col = column_map.get(dimension)
+        if not col:
+            return "⚠ Unsupported salary breakdown."
+
+        data = average_salary_by(df, col)
 
         if wants_chart:
-            fig = build_chart(data, chart_type)
-            return fig
+            return build_chart(data, chart_type)
 
-        st.dataframe(render_table(data), use_container_width=True)
-        return None
+        return data.reset_index(name="Average Salary")
+
+    # ===============================
+    # 8️⃣ ENGAGEMENT
+    # ===============================
+    if metric == "engagement":
+
+        if not dimension:
+            value = average_engagement(df)
+            return pd.DataFrame({
+                "Metric": ["Average Engagement Score"],
+                "Value": [value]
+            })
+
+        column_map = {
+            "DEPARTMENT": "Department",
+            "LOCATION": "Location",
+            "GENDER": "Gender"
+        }
+        col = column_map.get(dimension)
+        if not col:
+            return "⚠ Unsupported engagement breakdown."
+
+        data = engagement_by(df, col)
+
+        if wants_chart:
+            return build_chart(data, chart_type)
+
+        return data.reset_index(name="Engagement Score")
+
+    # ===============================
+    # 9️⃣ DIVERSITY
+    # ===============================
+    if metric == "gender":
+        data = gender_distribution(df)
+
+        if wants_chart:
+            return build_chart(data, chart_type)
+
+        return data.reset_index(name="Count")
 
     # ===============================
     # 🔟 ML ATTRITION PREDICTION
     # ===============================
-    if wants_forecast or "predict attrition" in query_l:
+    if wants_forecast:
         try:
             pred_df = predict_attrition(df)
-            st.dataframe(pred_df.head(20), use_container_width=True)
-            return (
-                "🤖 **Attrition Risk Prediction Generated**\n\n"
-                "Showing top employees with predicted attrition risk."
-            )
-        except Exception as e:
+            return pred_df.sort_values("Attrition_Risk", ascending=False).head(20)
+        except Exception:
             return "⚠ Unable to run attrition prediction model."
 
     # ===============================
