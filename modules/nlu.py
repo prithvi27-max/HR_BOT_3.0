@@ -70,3 +70,19 @@ def extract_dimension(query: str):
         if any(word in q for word in synonyms):
             return dim
     return None
+# ---------------------------
+# CHART TYPE EXTRACTION
+# ---------------------------
+def extract_chart_type(query):
+    q = query.lower()
+
+    if any(k in q for k in ["line", "trend", "over time", "time series"]):
+        return "LINE"
+
+    if any(k in q for k in ["pie", "ratio", "share"]):
+        return "PIE"
+
+    if any(k in q for k in ["bar", "compare", "comparison"]):
+        return "BAR"
+
+    return "BAR"  # default
