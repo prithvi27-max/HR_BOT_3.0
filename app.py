@@ -110,4 +110,5 @@ if user_query:
     elif response is not None:
         with st.chat_message("assistant"):
             st.markdown(response)
-        add_message("assistant", response)
+    add_message("assistant", response)
+
