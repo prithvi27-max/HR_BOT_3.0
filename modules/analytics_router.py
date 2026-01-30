@@ -40,7 +40,7 @@ from modules.charts import build_chart
 from modules.llm_engine import call_llm
 
 # ML
-from ml.attrition_model import predict_attrition
+from ml.predict import predict_attrition
 
 
 # ======================================================
