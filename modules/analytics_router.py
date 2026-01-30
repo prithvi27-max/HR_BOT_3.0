@@ -2,7 +2,7 @@ import pandas as pd
 from plotly.graph_objs import Figure
 
 # ===============================
-# IMPORTS THAT ACTUALLY EXIST
+# IMPORTS
 # ===============================
 from modules.analytics import (
     load_master,
@@ -47,6 +47,7 @@ from ml.predict import predict_attrition
 # MAIN ROUTER
 # ======================================================
 def process_query(query: str, language: str = "en"):
+
     q = query.lower().strip()
 
     # ===============================
@@ -56,12 +57,11 @@ def process_query(query: str, language: str = "en"):
         return (
             "👋 **Hi! I’m HR-GPT 3.0**\n\n"
             "You can ask me:\n"
-            "- Total headcount\n"
-            "- Active headcount\n"
-            "- Headcount by department\n"
-            "- Attrition rate by year\n"
-            "- Salary or engagement analysis\n"
-            "- Predict attrition risk"
+            "- Total or active headcount\n"
+            "- Headcount by department / year\n"
+            "- Attrition rate & trends\n"
+            "- Salary & engagement analysis\n"
+            "- 🔮 Predict attrition risk (ML)"
         )
 
     # ===============================
@@ -76,7 +76,7 @@ def process_query(query: str, language: str = "en"):
         return "⚠ HR dataset is empty."
 
     # ===============================
-    # 3️⃣ EXTRACT SIGNALS (NO detect_intent)
+    # 3️⃣ SIGNAL EXTRACTION
     # ===============================
     metric = extract_metric(query)
     dimension = extract_dimension(query)
@@ -84,7 +84,10 @@ def process_query(query: str, language: str = "en"):
 
     wants_chart = any(k in q for k in ["chart", "plot", "graph", "bar", "pie", "line"])
     wants_definition = any(k in q for k in ["what is", "define", "explain", "meaning"])
-    wants_forecast = any(k in q for k in ["predict", "forecast", "risk", "probability"])
+    wants_forecast = any(k in q for k in [
+        "predict", "prediction", "risk", "probability",
+        "chance", "likelihood", "who will leave"
+    ])
 
     # ===============================
     # 4️⃣ DEFINITIONS → LLM
@@ -92,30 +95,39 @@ def process_query(query: str, language: str = "en"):
     if wants_definition:
         return call_llm(query, language)
 
+    # ==================================================
+    # 🔟 ML ATTRITION PREDICTION (🔥 MUST COME EARLY 🔥)
+    # ==================================================
+    if wants_forecast:
+        try:
+            pred_df = predict_attrition(df)
+            return (
+                pred_df
+                .sort_values("Attrition_Risk", ascending=False)
+                .head(20)
+            )
+        except Exception as e:
+            return "⚠ Unable to run attrition prediction model."
+
     # ===============================
     # 5️⃣ HEADCOUNT
     # ===============================
     if metric == "headcount":
 
-        # TOTAL HEADCOUNT
         if "total" in q:
             return pd.DataFrame({
                 "Metric": ["Total Headcount"],
                 "Value": [total_headcount(df)]
             })
 
-        # ACTIVE HEADCOUNT (DEFAULT)
         if not dimension:
             return pd.DataFrame({
                 "Metric": ["Active Headcount"],
                 "Value": [active_headcount(df)]
             })
 
-        # HEADCOUNT BY YEAR
         if dimension == "YEAR":
             data = active_headcount_by_year(df)
-
-        # HEADCOUNT BY OTHER DIMENSIONS
         else:
             column_map = {
                 "DEPARTMENT": "Department",
@@ -125,11 +137,7 @@ def process_query(query: str, language: str = "en"):
             col = column_map.get(dimension)
             if not col:
                 return "⚠ Unsupported headcount breakdown."
-
             data = active_headcount_by(df, col)
-
-        if data is None or data.empty:
-            return "⚠ Unable to compute headcount."
 
         if wants_chart:
             return build_chart(data, chart_type)
@@ -137,22 +145,18 @@ def process_query(query: str, language: str = "en"):
         return data.reset_index(name="Headcount")
 
     # ===============================
-    # 6️⃣ ATTRITION
+    # 6️⃣ ATTRITION (DESCRIPTIVE)
     # ===============================
     if metric == "attrition":
 
-        # OVERALL ATTRITION RATE
         if not dimension:
             return pd.DataFrame({
                 "Metric": ["Attrition Rate (%)"],
                 "Value": [attrition_rate(df)]
             })
 
-        # ATTRITION BY YEAR
         if dimension == "YEAR":
             data = attrition_by_year(df)
-
-        # ATTRITION BY DIMENSION
         else:
             column_map = {
                 "DEPARTMENT": "Department",
@@ -162,11 +166,7 @@ def process_query(query: str, language: str = "en"):
             col = column_map.get(dimension)
             if not col:
                 return "⚠ Unsupported attrition breakdown."
-
             data = attrition_rate_by(df, col)
-
-        if data is None or data.empty:
-            return "⚠ Unable to compute attrition."
 
         if wants_chart:
             return build_chart(data, chart_type)
@@ -237,20 +237,6 @@ def process_query(query: str, language: str = "en"):
             return build_chart(data, chart_type)
 
         return data.reset_index(name="Count")
-
-    # ===============================
-    # 🔟 ML ATTRITION PREDICTION
-    # ===============================
-    if wants_forecast:
-        try:
-            pred_df = predict_attrition(df)
-            return (
-                pred_df
-                .sort_values("Attrition_Risk", ascending=False)
-                .head(20)
-            )
-        except Exception:
-            return "⚠ Unable to run attrition prediction model."
 
     # ===============================
     # 1️⃣1️⃣ FALLBACK → LLM
