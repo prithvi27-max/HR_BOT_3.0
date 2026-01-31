@@ -113,7 +113,7 @@ def process_query(query: str, language: str = "en"):
             return (
                 pred_df
                 .sort_values("Attrition_Risk", ascending=False)
-                .head(20)
+                .head()
             )
         except Exception:
             return "⚠ Unable to run attrition prediction model."
