@@ -84,6 +84,16 @@ LABELS = {
 def t(key, lang):
     return LABELS.get(lang, LABELS["en"]).get(key, key)
 
+# ======================================================
+# 🔐 HR DOMAIN GUARD
+# ======================================================
+HR_METRICS = {
+    "headcount",
+    "attrition",
+    "salary",
+    "engagement",
+    "gender"
+}
 
 # ======================================================
 # 🔒 STRICT QUERY NORMALIZER (THIS FIXES MULTILINGUAL)
@@ -290,7 +300,33 @@ def process_query(query: str, language: str = "en"):
         data = gender_distribution(df)
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Count")
 
-    # ==================================================
-    # 1️⃣2️⃣ FALLBACK → LLM
-    # ==================================================
-    return call_llm(query, language)
+   # ==================================================
+# 1️⃣2️⃣ DOMAIN GUARD (HR ONLY – FINAL)
+# ==================================================
+if metric is None:
+    return (
+        "⚠ This assistant is strictly limited to **HR analytics only**.\n\n"
+        "You can ask about:\n"
+        "- Headcount\n"
+        "- Attrition\n"
+        "- Salary\n"
+        "- Engagement\n"
+        "- Workforce diversity\n\n"
+        "Please rephrase your question within the HR domain."
+    )
+
+# --------------------------------------------------
+# Safe HR-only fallback to LLM (NO GENERAL KNOWLEDGE)
+# --------------------------------------------------
+return call_llm(
+    f"""
+You are an HR analytics assistant.
+Answer ONLY if the question is related to HR metrics
+(headcount, attrition, salary, engagement, workforce analytics).
+If not related to HR, politely refuse.
+
+Question:
+{query}
+""",
+    language
+)
