@@ -1,36 +1,31 @@
 import pandas as pd
 
 # ===============================
-# CORE ANALYTICS (EXISTING)
+# CORE ANALYTICS
 # ===============================
 from modules.analytics import (
     load_master,
 
-    # Headcount
     active_headcount,
     total_headcount,
     active_headcount_by,
     active_headcount_by_year,
 
-    # Attrition
     attrition_rate,
     attrition_rate_by,
     attrition_by_year,
 
-    # Salary
     average_salary,
     average_salary_by,
 
-    # Engagement
     average_engagement,
     engagement_by,
 
-    # Diversity
     gender_distribution
 )
 
 # ===============================
-# NLU (ONLY EXISTING FUNCTIONS)
+# NLU (EXISTING ONLY)
 # ===============================
 from modules.nlu import (
     extract_metric,
@@ -42,14 +37,14 @@ from modules.charts import build_chart
 from modules.llm_engine import call_llm
 
 # ===============================
-# ML (ONLY EXISTING FILES)
+# ML
 # ===============================
 from ml.predict import predict_attrition, add_risk_bucket
 from ml.evaluate import load_ml_metrics
 
 
 # ======================================================
-# 🌍 MULTI-LANGUAGE LABEL MAP (UI ONLY)
+# 🌍 UI LABEL TRANSLATIONS (DISPLAY ONLY)
 # ======================================================
 LABELS = {
     "en": {
@@ -75,12 +70,44 @@ LABELS = {
         "AVERAGE_SALARY": "Salaire moyen",
         "AVERAGE_ENGAGEMENT": "Engagement moyen",
         "MODEL_METRICS": "Évaluation du modèle ML"
+    },
+    "es": {
+        "ACTIVE_HEADCOUNT": "Número de empleados activos",
+        "TOTAL_HEADCOUNT": "Número total de empleados",
+        "ATTRITION_RATE": "Tasa de rotación (%)",
+        "AVERAGE_SALARY": "Salario promedio",
+        "AVERAGE_ENGAGEMENT": "Compromiso promedio",
+        "MODEL_METRICS": "Evaluación del modelo ML"
     }
 }
 
-
 def t(key, lang):
     return LABELS.get(lang, LABELS["en"]).get(key, key)
+
+
+# ======================================================
+# 🔒 STRICT QUERY NORMALIZER (THIS FIXES MULTILINGUAL)
+# ======================================================
+def normalize_query_to_english(query: str) -> str:
+    """
+    Translate HR analytics query to STRICT English keywords.
+    No explanations. One sentence only.
+    """
+    prompt = f"""
+Translate the following HR analytics question to English.
+
+Rules:
+- Use ONLY these words if applicable:
+  headcount, attrition, salary, engagement, gender, department, year, location, chart
+- Do NOT explain
+- Do NOT add examples
+- Return ONE short sentence only
+
+Query:
+{query}
+"""
+    translated = call_llm(prompt, language="en")
+    return translated.strip().lower()
 
 
 # ======================================================
@@ -89,17 +116,14 @@ def t(key, lang):
 def process_query(query: str, language: str = "en"):
 
     # --------------------------------------------------
-    # 🌐 NORMALIZE QUERY TO ENGLISH (CRITICAL FIX)
+    # 🌐 NORMALIZE QUERY (CRITICAL)
     # --------------------------------------------------
     if language != "en":
-        normalized_query = call_llm(
-            f"Translate this HR analytics question to English, do not explain: {query}",
-            language="en"
-        )
+        normalized_query = normalize_query_to_english(query)
     else:
-        normalized_query = query
+        normalized_query = query.lower().strip()
 
-    q = normalized_query.lower().strip()
+    q = normalized_query
 
     # ==================================================
     # 1️⃣ GREETINGS
@@ -127,7 +151,7 @@ def process_query(query: str, language: str = "en"):
         return "⚠ HR dataset is empty."
 
     # ==================================================
-    # 3️⃣ NLU EXTRACTION (ON ENGLISH QUERY)
+    # 3️⃣ NLU (ONLY ON NORMALIZED QUERY)
     # ==================================================
     metric = extract_metric(normalized_query)
     dimension = extract_dimension(normalized_query)
@@ -135,17 +159,17 @@ def process_query(query: str, language: str = "en"):
 
     wants_chart = any(k in q for k in ["chart", "plot", "graph", "bar", "pie", "line"])
     wants_definition = any(k in q for k in ["what is", "define", "explain", "meaning"])
-    wants_prediction = any(k in q for k in ["predict", "prediction", "risk", "likely to leave"])
-    wants_model_metrics = any(k in q for k in ["model performance", "auc", "precision", "recall"])
+    wants_prediction = any(k in q for k in ["predict", "prediction", "risk", "likely"])
+    wants_model_metrics = any(k in q for k in ["model", "auc", "precision", "recall"])
 
     # ==================================================
-    # 4️⃣ DEFINITIONS → LLM (MULTILINGUAL)
+    # 4️⃣ DEFINITIONS → LLM (USER LANGUAGE)
     # ==================================================
     if wants_definition:
         return call_llm(query, language)
 
     # ==================================================
-    # 5️⃣ ML ATTRITION PREDICTION (PRIORITY)
+    # 5️⃣ ML ATTRITION PREDICTION
     # ==================================================
     if wants_prediction:
         try:
@@ -153,8 +177,10 @@ def process_query(query: str, language: str = "en"):
             pred_df = add_risk_bucket(pred_df)
 
             if wants_chart:
-                risk_counts = pred_df["Risk_Bucket"].value_counts()
-                return build_chart(risk_counts, chart_type)
+                return build_chart(
+                    pred_df["Risk_Bucket"].value_counts(),
+                    chart_type
+                )
 
             return pred_df.sort_values("Attrition_Risk", ascending=False)
 
@@ -204,7 +230,7 @@ def process_query(query: str, language: str = "en"):
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Headcount")
 
     # ==================================================
-    # 8️⃣ ATTRITION (DESCRIPTIVE)
+    # 8️⃣ ATTRITION
     # ==================================================
     if metric == "attrition":
 
@@ -214,8 +240,13 @@ def process_query(query: str, language: str = "en"):
                 "Value": [attrition_rate(df)]
             })
 
-        data = attrition_by_year(df) if dimension == "YEAR" else attrition_rate_by(
-            df, {"DEPARTMENT": "Department", "LOCATION": "Location", "GENDER": "Gender"}.get(dimension)
+        data = (
+            attrition_by_year(df)
+            if dimension == "YEAR"
+            else attrition_rate_by(
+                df,
+                {"DEPARTMENT": "Department", "LOCATION": "Location", "GENDER": "Gender"}.get(dimension)
+            )
         )
 
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Attrition Rate")
