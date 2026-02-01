@@ -172,11 +172,21 @@ def process_query(query: str, language: str = "en"):
     wants_prediction = any(k in q for k in ["predict", "prediction", "risk", "likely"])
     wants_model_metrics = any(k in q for k in ["model", "auc", "precision", "recall"])
 
-    # ==================================================
-    # 4️⃣ DEFINITIONS → LLM (USER LANGUAGE)
-    # ==================================================
-    if wants_definition:
-        return call_llm(query, language)
+   # ==================================================
+# 🔐 DOMAIN GUARD (ABSOLUTE – BLOCK NON-HR)
+# ==================================================
+    if metric is None:
+        return (
+        "⚠ This assistant is strictly limited to **HR analytics only**.\n\n"
+        "You can ask about:\n"
+        "- Headcount\n"
+        "- Attrition\n"
+        "- Salary\n"
+        "- Engagement\n"
+        "- Workforce diversity\n\n"
+        "Please rephrase your question within the HR domain."
+    )
+
 
     # ==================================================
     # 5️⃣ ML ATTRITION PREDICTION
