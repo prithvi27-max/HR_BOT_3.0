@@ -1,5 +1,4 @@
 import pandas as pd
-from plotly.graph_objs import Figure
 
 # ===============================
 # CORE ANALYTICS (EXISTING)
@@ -31,7 +30,7 @@ from modules.analytics import (
 )
 
 # ===============================
-# NLU (EXISTING FUNCTIONS ONLY)
+# NLU (ONLY EXISTING FUNCTIONS)
 # ===============================
 from modules.nlu import (
     extract_metric,
@@ -43,14 +42,53 @@ from modules.charts import build_chart
 from modules.llm_engine import call_llm
 
 # ===============================
-# ML (EXISTING FILES ONLY)
+# ML (ONLY EXISTING FILES)
 # ===============================
-from ml.predict import predict_attrition
+from ml.predict import predict_attrition, add_risk_bucket
 from ml.evaluate import load_ml_metrics
-from ml.predict import add_risk_bucket  # you already added this
+
 
 # ======================================================
-# MAIN ROUTER
+# 🌍 MULTI-LANGUAGE LABEL MAP (SAFE & EXAM-READY)
+# ======================================================
+LABELS = {
+    "en": {
+        "ACTIVE_HEADCOUNT": "Active Headcount",
+        "TOTAL_HEADCOUNT": "Total Headcount",
+        "ATTRITION_RATE": "Attrition Rate (%)",
+        "AVERAGE_SALARY": "Average Salary",
+        "AVERAGE_ENGAGEMENT": "Average Engagement Score",
+        "ATTRITION_PREDICTION": "Attrition Prediction Results",
+        "MODEL_METRICS": "ML Model Evaluation Metrics"
+    },
+    "de": {
+        "ACTIVE_HEADCOUNT": "Aktiver Mitarbeiterbestand",
+        "TOTAL_HEADCOUNT": "Gesamtmitarbeiterzahl",
+        "ATTRITION_RATE": "Fluktuationsrate (%)",
+        "AVERAGE_SALARY": "Durchschnittsgehalt",
+        "AVERAGE_ENGAGEMENT": "Durchschnittliches Engagement",
+        "ATTRITION_PREDICTION": "Fluktuationsvorhersage",
+        "MODEL_METRICS": "ML-Modellbewertung"
+    },
+    "fr": {
+        "ACTIVE_HEADCOUNT": "Effectif actif",
+        "TOTAL_HEADCOUNT": "Effectif total",
+        "ATTRITION_RATE": "Taux d’attrition (%)",
+        "AVERAGE_SALARY": "Salaire moyen",
+        "AVERAGE_ENGAGEMENT": "Engagement moyen",
+        "ATTRITION_PREDICTION": "Prédiction d’attrition",
+        "MODEL_METRICS": "Évaluation du modèle ML"
+    }
+}
+
+
+def t(key, lang):
+    """Translate metric labels safely"""
+    return LABELS.get(lang, LABELS["en"]).get(key, key)
+
+
+# ======================================================
+# 🚦 MAIN ROUTER
 # ======================================================
 def process_query(query: str, language: str = "en"):
     q = query.lower().strip()
@@ -81,7 +119,7 @@ def process_query(query: str, language: str = "en"):
         return "⚠ HR dataset is empty."
 
     # ==================================================
-    # 3️⃣ SIGNAL EXTRACTION (NO detect_intent)
+    # 3️⃣ SIGNAL EXTRACTION
     # ==================================================
     metric = extract_metric(query)
     dimension = extract_dimension(query)
@@ -93,37 +131,42 @@ def process_query(query: str, language: str = "en"):
     wants_model_metrics = any(k in q for k in ["model performance", "auc", "precision", "recall"])
 
     # ==================================================
-    # 4️⃣ DEFINITIONS → LLM
+    # 4️⃣ DEFINITIONS → LLM (MULTILINGUAL)
     # ==================================================
     if wants_definition:
         return call_llm(query, language)
 
     # ==================================================
-    # 5️⃣ ML ATTRITION (🔥 OVERRIDE – VERY IMPORTANT)
+    # 5️⃣ ML ATTRITION PREDICTION (🔥 PRIORITY)
     # ==================================================
     if wants_prediction:
         try:
             pred_df = predict_attrition(df)
             pred_df = add_risk_bucket(pred_df)
 
+            # Chart: Risk bucket distribution
             if wants_chart:
                 risk_counts = pred_df["Risk_Bucket"].value_counts()
                 return build_chart(risk_counts, chart_type)
 
+            # Return ALL active employees (not just top 20)
             return (
                 pred_df
                 .sort_values("Attrition_Risk", ascending=False)
-                .head(10000)
+                .reset_index(drop=True)
             )
+
         except Exception:
             return "⚠ Unable to run attrition prediction model."
 
     # ==================================================
-    # 6️⃣ ML MODEL EVALUATION
+    # 6️⃣ ML MODEL EVALUATION METRICS
     # ==================================================
     if wants_model_metrics:
         try:
-            return load_ml_metrics()
+            metrics_df = load_ml_metrics()
+            metrics_df.insert(0, "Metric Type", t("MODEL_METRICS", language))
+            return metrics_df
         except Exception:
             return "⚠ ML evaluation metrics not found. Train the model first."
 
@@ -134,13 +177,13 @@ def process_query(query: str, language: str = "en"):
 
         if "total" in q:
             return pd.DataFrame({
-                "Metric": ["Total Headcount"],
+                "Metric": [t("TOTAL_HEADCOUNT", language)],
                 "Value": [total_headcount(df)]
             })
 
         if not dimension:
             return pd.DataFrame({
-                "Metric": ["Active Headcount"],
+                "Metric": [t("ACTIVE_HEADCOUNT", language)],
                 "Value": [active_headcount(df)]
             })
 
@@ -163,13 +206,13 @@ def process_query(query: str, language: str = "en"):
         return data.reset_index(name="Headcount")
 
     # ==================================================
-    # 8️⃣ ATTRITION (DESCRIPTIVE ONLY)
+    # 8️⃣ ATTRITION (DESCRIPTIVE)
     # ==================================================
     if metric == "attrition":
 
         if not dimension:
             return pd.DataFrame({
-                "Metric": ["Attrition Rate (%)"],
+                "Metric": [t("ATTRITION_RATE", language)],
                 "Value": [attrition_rate(df)]
             })
 
@@ -198,7 +241,7 @@ def process_query(query: str, language: str = "en"):
 
         if not dimension:
             return pd.DataFrame({
-                "Metric": ["Average Salary"],
+                "Metric": [t("AVERAGE_SALARY", language)],
                 "Value": [average_salary(df)]
             })
 
@@ -225,7 +268,7 @@ def process_query(query: str, language: str = "en"):
 
         if not dimension:
             return pd.DataFrame({
-                "Metric": ["Average Engagement Score"],
+                "Metric": [t("AVERAGE_ENGAGEMENT", language)],
                 "Value": [average_engagement(df)]
             })
 
@@ -257,6 +300,6 @@ def process_query(query: str, language: str = "en"):
         return data.reset_index(name="Count")
 
     # ==================================================
-    # 1️⃣2️⃣ FALLBACK → LLM
+    # 1️⃣2️⃣ FALLBACK → LLM (MULTILINGUAL)
     # ==================================================
     return call_llm(query, language)
