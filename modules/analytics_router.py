@@ -315,9 +315,9 @@ def process_query(query: str, language: str = "en"):
         "Please rephrase your question within the HR domain."
     )
 
-    # ==================================================
-    # 1️⃣2️⃣ DOMAIN GUARD (HR ONLY – FINAL)
-    # ==================================================
+       # ==================================================
+        # 1️⃣2️⃣ DOMAIN GUARD (ABSOLUTE – NO LLM)
+        # ==================================================
     if metric is None:
         return (
             "⚠ This assistant is strictly limited to **HR analytics only**.\n\n"
@@ -329,20 +329,3 @@ def process_query(query: str, language: str = "en"):
             "- Workforce diversity\n\n"
             "Please rephrase your question within the HR domain."
         )
-
-    # --------------------------------------------------
-    # Safe HR-only fallback to LLM (NO GENERAL KNOWLEDGE)
-    # --------------------------------------------------
-        return call_llm(
-        f"""
-You are an HR analytics assistant.
-Answer ONLY if the question is related to HR metrics
-(headcount, attrition, salary, engagement, workforce analytics).
-If not related to HR, politely refuse.
-
-Question:
-{query}
-""",
-        language
-    )
-
