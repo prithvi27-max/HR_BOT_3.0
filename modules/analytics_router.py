@@ -88,11 +88,11 @@ def t(key, lang):
 # 🔐 HR DOMAIN GUARD
 # ======================================================
 HR_METRICS = {
-    "headcount",
-    "attrition",
-    "salary",
-    "engagement",
-    "gender"
+        "headcount",
+        "attrition",
+        "salary",
+        "engagement",
+        "gender"
 }
 
 # ======================================================
