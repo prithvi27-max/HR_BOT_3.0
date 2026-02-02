@@ -47,7 +47,7 @@ with st.sidebar:
 # ==================================================
 # TITLE
 # ==================================================
-st.title("HR-GPT 3.0: Multilingual AI-Powered HR Analytics Assistant")
+st.title("HR-GPT 3.0")
 
 # ==================================================
 # CHAT STATE
