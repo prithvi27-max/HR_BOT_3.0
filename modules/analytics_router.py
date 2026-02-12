@@ -82,7 +82,7 @@ Query:
 def process_query(query: str, language: str = "en"):
 
     # ==================================================
-    # 1️⃣ DEFINITION / KNOWLEDGE INTENT
+    # 🧠 1️⃣ DEFINITION INTENT (HIGHEST PRIORITY)
     # ==================================================
     definition_keywords = [
         "what is", "definition", "define",
@@ -93,7 +93,7 @@ def process_query(query: str, language: str = "en"):
         return call_llm(
             f"""
 You are an HR analytics assistant.
-Explain the following HR concept clearly.
+Explain this HR concept clearly in simple business language.
 
 Concept:
 {query}
@@ -102,14 +102,12 @@ Concept:
         )
 
     # ==================================================
-    # 2️⃣ NORMALIZE QUERY
+    # 🌐 2️⃣ NORMALIZE QUERY
     # ==================================================
     if language != "en":
         normalized_query = normalize_query_to_english(query)
     else:
         normalized_query = query.lower().strip()
-
-    q = normalized_query
 
     # ==================================================
     # 3️⃣ GREETING
