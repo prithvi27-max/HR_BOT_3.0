@@ -70,44 +70,33 @@ def active_headcount_by_year(df):
     return active.groupby("Hire_Year")["Employee_ID"].nunique().sort_index()
 
 
-# =========================================================
-# ATTRITION
-# =========================================================
-def attrition_count(df):
-    exited = df[df["Status"].isin(["Resigned", "Terminated"])]
-    return exited["Employee_ID"].nunique()
+# ==================================================
+# 🔄 ATTRITION
+# ==================================================
+    if metric == "attrition":
 
+        if not dimension:
+            return pd.DataFrame({
+            "Metric": [t("ATTRITION_RATE", language)],
+            "Value": [attrition_rate(df)]
+        })
 
-def attrition_rate(df):
-    active = active_headcount(df)
-    exited = attrition_count(df)
+    col_map = {
+        "DEPARTMENT": "Department",
+        "LOCATION": "Location",
+        "GENDER": "Gender"
+    }
 
-    if active == 0:
-        return 0.0
+    if dimension == "YEAR":
+        data = attrition_by_year(df)
+    else:
+        data = attrition_rate_by(df, col_map.get(dimension))
 
-    return round((exited / active) * 100, 2)
+    # 🛑 SAFE GUARD
+    if data is None or len(data) == 0:
+        return "⚠ No attrition data available for this breakdown."
 
-
-def attrition_rate_by(df, column):
-    if column not in df.columns:
-        return None
-
-    rates = {}
-    for val in df[column].dropna().unique():
-        sub = df[df[column] == val]
-        active = active_headcount(sub)
-        exited = attrition_count(sub)
-        rates[val] = round((exited / active) * 100, 2) if active else 0
-
-    return pd.Series(rates).sort_values(ascending=False)
-
-
-def attrition_by_year(df):
-    exited = df[df["Status"].isin(["Resigned", "Terminated"])]
-    if "Exit_Year" not in exited.columns:
-        return None
-    return exited.groupby("Exit_Year")["Employee_ID"].nunique().sort_index()
-
+    return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Attrition Rate")
 
 # =========================================================
 # SALARY
