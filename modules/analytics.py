@@ -11,7 +11,7 @@ SUPABASE_KEY = st.secrets["SUPABASE_ANON_KEY"]
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
-    "Authorization": f"Bearer {SUPABASE_KEY},
+    "Authorization": f"Bearer {SUPABASE_KEY}",
     "Content-Type": "application/json",
 }
 
