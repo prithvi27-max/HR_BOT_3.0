@@ -1,8 +1,7 @@
-# modules/analytics.py
-
 import pandas as pd
 import requests
 import streamlit as st
+from datetime import datetime
 
 # =========================================================
 # SUPABASE CONFIG
@@ -12,7 +11,7 @@ SUPABASE_KEY = st.secrets["SUPABASE_ANON_KEY"]
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
-    "Authorization": f"Bearer {SUPABASE_KEY}",
+    "Authorization": f"Bearer {SUPABASE_KEY},
     "Content-Type": "application/json",
 }
 
@@ -21,112 +20,166 @@ HEADERS = {
 # =========================================================
 @st.cache_data(ttl=300)
 def load_master():
+
     url = f"{SUPABASE_URL}/rest/v1/hr_master?select=*"
     resp = requests.get(url, headers=HEADERS, timeout=20)
     resp.raise_for_status()
 
     df = pd.DataFrame(resp.json())
-    df.columns = [c.strip() for c in df.columns]
 
-    if "Employee_ID" in df.columns:
-        df["Employee_ID"] = df["Employee_ID"].astype(str)
-
-    if "Hire_Date" in df.columns:
-        df["Hire_Date"] = pd.to_datetime(df["Hire_Date"], errors="coerce")
-        df["Hire_Year"] = df["Hire_Date"].dt.year
-
-    if "Exit_Date" in df.columns:
-        df["Exit_Date"] = pd.to_datetime(df["Exit_Date"], errors="coerce")
-        df["Exit_Year"] = df["Exit_Date"].dt.year
+    df["Hire_Date"] = pd.to_datetime(df["Hire_Date"], errors="coerce")
+    df["Exit_Date"] = pd.to_datetime(df["Exit_Date"], errors="coerce")
 
     return df
+
+
+# =========================================================
+# HELPER → ACTIVE WORKFORCE SNAPSHOT
+# =========================================================
+def active_workforce(df, snapshot_date=None):
+
+    if snapshot_date is None:
+        snapshot_date = pd.Timestamp.today()
+
+    return df[
+        (df["Hire_Date"] <= snapshot_date)
+        &
+        (
+            df["Exit_Date"].isna()
+            | (df["Exit_Date"] > snapshot_date)
+        )
+    ]
 
 
 # =========================================================
 # HEADCOUNT
 # =========================================================
 def active_headcount(df):
-    """Active headcount (default HR meaning)"""
-    active = df[df["Status"] == "Active"]
-    return active["Employee_ID"].nunique()
+
+    return active_workforce(df)["Employee_ID"].nunique()
 
 
 def total_headcount(df):
-    """All employees ever (historical)"""
+
     return df["Employee_ID"].nunique()
 
 
 def active_headcount_by(df, column):
-    active = df[df["Status"] == "Active"]
-    if column not in active.columns:
+
+    wf = active_workforce(df)
+
+    if column not in wf.columns:
         return None
-    return active.groupby(column)["Employee_ID"].nunique().sort_values(ascending=False)
+
+    return wf.groupby(column)["Employee_ID"].nunique().sort_values(ascending=False)
 
 
 def active_headcount_by_year(df):
-    active = df[df["Status"] == "Active"]
-    if "Hire_Year" not in active.columns:
+
+    years = pd.date_range(df["Hire_Date"].min(), pd.Timestamp.today(), freq="Y")
+
+    result = {}
+
+    for d in years:
+        result[d.year] = active_workforce(df, d)["Employee_ID"].nunique()
+
+    return pd.Series(result)
+
+
+# =========================================================
+# ATTRITION
+# =========================================================
+def attrition_rate(df):
+
+    current_year = pd.Timestamp.today().year
+
+    exits = df[
+        df["Exit_Date"].dt.year == current_year
+    ]["Employee_ID"].nunique()
+
+    workforce = active_workforce(
+        df,
+        pd.Timestamp(year=current_year, month=12, day=31)
+    )["Employee_ID"].nunique()
+
+    if workforce == 0:
+        return 0
+
+    return round((exits / workforce) * 100, 2)
+
+
+def attrition_rate_by(df, column):
+
+    if column not in df.columns:
         return None
-    return active.groupby("Hire_Year")["Employee_ID"].nunique().sort_index()
+
+    exited = df[df["Exit_Date"].notna()]
+
+    result = {}
+
+    for val in df[column].dropna().unique():
+
+        sub = df[df[column] == val]
+
+        exits = sub[sub["Exit_Date"].notna()]["Employee_ID"].nunique()
+        workforce = active_workforce(sub)["Employee_ID"].nunique()
+
+        if workforce == 0:
+            result[val] = 0
+        else:
+            result[val] = round((exits / workforce) * 100, 2)
+
+    return pd.Series(result).sort_values(ascending=False)
 
 
-# ==================================================
-# 🔄 ATTRITION
-# ==================================================
-    if metric == "attrition":
+def attrition_by_year(df):
 
-        if not dimension:
-            return pd.DataFrame({
-            "Metric": [t("ATTRITION_RATE", language)],
-            "Value": [attrition_rate(df)]
-        })
+    exited = df[df["Exit_Date"].notna()]
 
-    col_map = {
-        "DEPARTMENT": "Department",
-        "LOCATION": "Location",
-        "GENDER": "Gender"
-    }
+    return exited.groupby(
+        exited["Exit_Date"].dt.year
+    )["Employee_ID"].nunique()
 
-    if dimension == "YEAR":
-        data = attrition_by_year(df)
-    else:
-        data = attrition_rate_by(df, col_map.get(dimension))
-
-    # 🛑 SAFE GUARD
-    if data is None or len(data) == 0:
-        return "⚠ No attrition data available for this breakdown."
-
-    return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Attrition Rate")
 
 # =========================================================
 # SALARY
 # =========================================================
 def average_salary(df):
-    return round(df["Salary"].mean(), 2)
+
+    return round(active_workforce(df)["Salary"].mean(), 2)
 
 
 def average_salary_by(df, column):
-    if column not in df.columns:
+
+    wf = active_workforce(df)
+
+    if column not in wf.columns:
         return None
-    return df.groupby(column)["Salary"].mean().round(2).sort_values(ascending=False)
+
+    return wf.groupby(column)["Salary"].mean().round(2)
 
 
 # =========================================================
 # ENGAGEMENT
 # =========================================================
 def average_engagement(df):
-    return round(df["Engagement_Score"].mean(), 2)
+
+    return round(active_workforce(df)["Engagement_Score"].mean(), 2)
 
 
 def engagement_by(df, column):
-    if column not in df.columns:
+
+    wf = active_workforce(df)
+
+    if column not in wf.columns:
         return None
-    return df.groupby(column)["Engagement_Score"].mean().round(2).sort_values(ascending=False)
+
+    return wf.groupby(column)["Engagement_Score"].mean().round(2)
 
 
 # =========================================================
 # DIVERSITY
 # =========================================================
 def gender_distribution(df):
-    active = df[df["Status"] == "Active"]
-    return active["Gender"].value_counts()
+
+    return active_workforce(df)["Gender"].value_counts()
