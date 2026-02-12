@@ -109,11 +109,14 @@ Concept:
     else:
         normalized_query = query.lower().strip()
 
+    q = normalized_query
+
     # ==================================================
-    # 3️⃣ GREETING
+    # 👋 3️⃣ GREETING
     # ==================================================
     if q in ["hi", "hello", "hey"]:
         return "👋 Hi! Ask me HR analytics questions."
+
 
     # ==================================================
     # 4️⃣ LOAD DATA
