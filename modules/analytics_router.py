@@ -205,8 +205,8 @@ Concept:
     # ==================================================
     if metric == "attrition":
 
-    if not dimension:
-        return pd.DataFrame({
+        if not dimension:
+            return pd.DataFrame({
             "Metric": [t("ATTRITION_RATE", language)],
             "Value": [attrition_rate(df)]
         })
