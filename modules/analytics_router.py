@@ -205,21 +205,30 @@ Concept:
     # ==================================================
     if metric == "attrition":
 
-        if not dimension:
-            return pd.DataFrame({
-                "Metric": [t("ATTRITION_RATE", language)],
-                "Value": [attrition_rate(df)]
-            })
+    if not dimension:
+        return pd.DataFrame({
+            "Metric": [t("ATTRITION_RATE", language)],
+            "Value": [attrition_rate(df)]
+        })
 
-        col_map = {
-            "DEPARTMENT": "Department",
-            "LOCATION": "Location",
-            "GENDER": "Gender"
-        }
+    col_map = {
+        "DEPARTMENT": "Department",
+        "LOCATION": "Location",
+        "GENDER": "Gender"
+    }
 
-        data = attrition_by_year(df) if dimension == "YEAR" else attrition_rate_by(df, col_map.get(dimension))
+    # ---- Get Data ----
+    data = (
+        attrition_by_year(df)
+        if dimension == "YEAR"
+        else attrition_rate_by(df, col_map.get(dimension))
+    )
 
-        return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Attrition Rate")
+    # ---- SAFETY CHECK ----
+    if data is None or len(data) == 0:
+        return "⚠ Attrition data not available for this breakdown."
+
+    return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Attrition Rate")
 
     # ==================================================
     # 💰 SALARY
