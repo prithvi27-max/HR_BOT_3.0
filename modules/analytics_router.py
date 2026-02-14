@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 
 # ===============================
 # CORE ANALYTICS
@@ -39,7 +40,7 @@ from ml.evaluate import load_ml_metrics
 
 
 # ======================================================
-# 🌍 UI LABEL TRANSLATIONS
+# 🌍 UI LABELS
 # ======================================================
 LABELS = {
     "en": {
@@ -56,24 +57,37 @@ def t(key, lang):
 
 
 # ======================================================
-# 🔒 QUERY NORMALIZER
+# 🔎 DYNAMIC FILTER ENGINE (NO ARCH CHANGE)
 # ======================================================
-def normalize_query_to_english(query: str) -> str:
+def apply_dynamic_filters(df, query: str):
 
-    prompt = f"""
-Translate the following HR analytics question to English.
+    q = query.lower()
 
-Rules:
-- Use ONLY these words if applicable:
-  headcount, attrition, salary, engagement, gender, department, year, location, chart
-- Return ONE short sentence only
+    # ---- Year filter ----
+    year_match = re.search(r"\b(20\d{2})\b", q)
+    if year_match and "Hire_Year" in df.columns:
+        year = int(year_match.group(1))
+        df = df[df["Hire_Year"] == year]
 
-Query:
-{query}
-"""
+    # ---- Gender filter ----
+    if "male" in q:
+        df = df[df["Gender"] == "M"]
+    if "female" in q:
+        df = df[df["Gender"] == "F"]
 
-    translated = call_llm(prompt, language="en")
-    return translated.strip().lower()
+    # ---- Department filter ----
+    if "Department" in df.columns:
+        for dept in df["Department"].dropna().unique():
+            if str(dept).lower() in q:
+                df = df[df["Department"] == dept]
+
+    # ---- Location filter ----
+    if "Location" in df.columns:
+        for loc in df["Location"].dropna().unique():
+            if str(loc).lower() in q:
+                df = df[df["Location"] == loc]
+
+    return df
 
 
 # ======================================================
@@ -82,7 +96,7 @@ Query:
 def process_query(query: str, language: str = "en"):
 
     # ==================================================
-    # 🧠 1️⃣ DEFINITION INTENT (HIGHEST PRIORITY)
+    # 🧠 1️⃣ DEFINITION INTENT (Highest Priority)
     # ==================================================
     definition_keywords = [
         "what is", "definition", "define",
@@ -102,24 +116,13 @@ Concept:
         )
 
     # ==================================================
-    # 🌐 2️⃣ NORMALIZE QUERY
+    # 👋 2️⃣ GREETING
     # ==================================================
-    if language != "en":
-        normalized_query = normalize_query_to_english(query)
-    else:
-        normalized_query = query.lower().strip()
-
-    q = normalized_query
-
-    # ==================================================
-    # 👋 3️⃣ GREETING
-    # ==================================================
-    if q in ["hi", "hello", "hey"]:
+    if query.lower().strip() in ["hi", "hello", "hey"]:
         return "👋 Hi! Ask me HR analytics questions."
 
-
     # ==================================================
-    # 4️⃣ LOAD DATA
+    # 📊 3️⃣ LOAD DATA
     # ==================================================
     try:
         df = load_master()
@@ -130,15 +133,21 @@ Concept:
         return "⚠ HR dataset empty."
 
     # ==================================================
-    # 5️⃣ NLU EXTRACTION
+    # 🔎 APPLY MULTI FILTERS
     # ==================================================
+    df = apply_dynamic_filters(df, query)
+
+    # ==================================================
+    # 🧠 4️⃣ NLU
+    # ==================================================
+    normalized_query = query.lower().strip()
     metric = extract_metric(normalized_query)
     dimension = extract_dimension(normalized_query)
     chart_type = extract_chart_type(normalized_query)
 
-    wants_chart = any(k in q for k in ["chart", "plot", "graph", "bar", "pie", "line"])
-    wants_prediction = any(k in q for k in ["predict", "risk"])
-    wants_model_metrics = any(k in q for k in ["auc", "precision", "recall"])
+    wants_chart = any(k in normalized_query for k in ["chart", "plot", "graph", "bar", "pie", "line"])
+    wants_prediction = any(k in normalized_query for k in ["predict", "risk"])
+    wants_model_metrics = any(k in normalized_query for k in ["auc", "precision", "recall"])
 
     # ==================================================
     # 🔐 DOMAIN GUARD
@@ -177,7 +186,7 @@ Concept:
     # ==================================================
     if metric == "headcount":
 
-        if "total" in q:
+        if "total" in normalized_query:
             return pd.DataFrame({
                 "Metric": [t("TOTAL_HEADCOUNT", language)],
                 "Value": [total_headcount(df)]
@@ -189,15 +198,19 @@ Concept:
                 "Value": [active_headcount(df)]
             })
 
+        col_map = {
+            "DEPARTMENT": "Department",
+            "LOCATION": "Location",
+            "GENDER": "Gender"
+        }
+
         if dimension == "YEAR":
             data = active_headcount_by_year(df)
         else:
-            col_map = {
-                "DEPARTMENT": "Department",
-                "LOCATION": "Location",
-                "GENDER": "Gender"
-            }
             data = active_headcount_by(df, col_map.get(dimension))
+
+        if data is None or len(data) == 0:
+            return "⚠ No headcount data available for this breakdown."
 
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Headcount")
 
@@ -208,28 +221,22 @@ Concept:
 
         if not dimension:
             return pd.DataFrame({
-            "Metric": [t("ATTRITION_RATE", language)],
-            "Value": [attrition_rate(df)]
-        })
+                "Metric": [t("ATTRITION_RATE", language)],
+                "Value": [attrition_rate(df)]
+            })
 
-    col_map = {
-        "DEPARTMENT": "Department",
-        "LOCATION": "Location",
-        "GENDER": "Gender"
-    }
+        col_map = {
+            "DEPARTMENT": "Department",
+            "LOCATION": "Location",
+            "GENDER": "Gender"
+        }
 
-    # ---- Get Data ----
-    data = (
-        attrition_by_year(df)
-        if dimension == "YEAR"
-        else attrition_rate_by(df, col_map.get(dimension))
-    )
+        data = attrition_by_year(df) if dimension == "YEAR" else attrition_rate_by(df, col_map.get(dimension))
 
-    # ---- SAFETY CHECK ----
-    if data is None or len(data) == 0:
-        return "⚠ Attrition data not available for this breakdown."
+        if data is None or len(data) == 0:
+            return "⚠ Attrition data not available for this breakdown."
 
-    return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Attrition Rate")
+        return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Attrition Rate")
 
     # ==================================================
     # 💰 SALARY
@@ -249,6 +256,9 @@ Concept:
         }
 
         data = average_salary_by(df, col_map.get(dimension))
+
+        if data is None or len(data) == 0:
+            return "⚠ Salary data not available for this breakdown."
 
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Average Salary")
 
@@ -271,6 +281,9 @@ Concept:
 
         data = engagement_by(df, col_map.get(dimension))
 
+        if data is None or len(data) == 0:
+            return "⚠ Engagement data not available for this breakdown."
+
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Engagement Score")
 
     # ==================================================
@@ -278,4 +291,8 @@ Concept:
     # ==================================================
     if metric == "gender":
         data = gender_distribution(df)
+
+        if data is None or len(data) == 0:
+            return "⚠ Gender data not available."
+
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Count")
