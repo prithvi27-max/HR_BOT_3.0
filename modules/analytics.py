@@ -42,9 +42,11 @@ def load_master():
         df["Hire_Date"] = pd.to_datetime(df["Hire_Date"], errors="coerce")
         df["Hire_Year"] = df["Hire_Date"].dt.year
 
-    if "Exit_Date" in df.columns:
-        df["Exit_Date"] = pd.to_datetime(df["Exit_Date"], errors="coerce")
-        df["Exit_Year"] = df["Exit_Date"].dt.year
+# 🔥 FIXED HERE
+    if "Termination_Date" in df.columns:
+        df["Termination_Date"] = pd.to_datetime(df["Termination_Date"], errors="coerce")
+        df["Exit_Year"] = df["Termination_Date"].dt.year
+
 
     return df
 
