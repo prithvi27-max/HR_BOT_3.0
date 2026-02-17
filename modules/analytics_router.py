@@ -96,7 +96,7 @@ Concept:
     wants_model_metrics = any(k in q for k in ["auc", "precision", "recall"])
 
     # ==================================================
-    # 🔥 PREDICTION BLOCK (MOVED ABOVE KPI LOGIC)
+    #  PREDICTION BLOCK
     # ==================================================
     if wants_prediction:
 

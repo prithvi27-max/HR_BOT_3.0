@@ -37,7 +37,7 @@ def predict_attrition(df):
     return df_out[["Employee_ID", "Attrition_Risk"]]
 
 # -------------------------------
-# ADD RISK BUCKET (🔥 THIS WAS MISSING)
+# ADD RISK BUCKET 
 # -------------------------------
 def add_risk_bucket(df):
     """

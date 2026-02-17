@@ -62,7 +62,8 @@ ensemble = VotingClassifier(
 # --------------------------------------------------
 ensemble.fit(X_train, y_train)
 
-y_pred = ensemble.predict(X_test)
+y_prob = ensemble.predict_proba(X_test)[:, 1]
+y_pred = (y_prob >= 0.35).astype(int)
 y_prob = ensemble.predict_proba(X_test)[:, 1]
 
 print("\nClassification Report")
