@@ -48,41 +48,46 @@ def process_query(query: str, language: str = "en"):
         return "Please enter a valid HR analytics question."
 
     original_query = query.strip()
-    q = original_query.lower()
 
     # ==================================================
-    # GREETING
-    # ==================================================
-    greetings = ["hi", "hello", "hey", "hii", "hola", "hallo"]
-
-    if any(g in q for g in greetings) and len(q.split()) <= 3:
-        return "👋 Hello! Ask me about headcount, attrition, salary, engagement, or diversity."
-
-    # ==================================================
-    # TRANSLATE NON-ENGLISH TO ENGLISH FOR NLU
+    # STEP 1: TRANSLATE FIRST (CRITICAL FIX)
     # ==================================================
     if language != "en":
         try:
             translated_query = call_llm(
                 f"""
-Translate this HR analytics question into English.
+Translate the following HR analytics question into English.
 Return ONLY the translated sentence.
+Do NOT add explanation.
 
 Question:
 {original_query}
 """,
                 language="en"
             )
+
             q = translated_query.lower().strip()
+
         except Exception:
             return "⚠ Unable to process multilingual request."
+    else:
+        q = original_query.lower().strip()
 
     # ==================================================
-    # DEFINITION INTENT
+    # STEP 2: GREETING (STRICT MATCH ONLY)
+    # ==================================================
+    greetings = ["hi", "hello", "hey", "hii", "hola", "hallo"]
+
+    if q in greetings:
+        return "👋 Hello! Ask me about headcount, attrition, salary, engagement, or diversity."
+
+    # ==================================================
+    # STEP 3: DEFINITION INTENT
     # ==================================================
     definition_keywords = ["what is", "definition", "define", "explain", "meaning"]
 
     if any(k in q for k in definition_keywords):
+
         response = call_llm(
             f"""
 You are an HR analytics assistant.
@@ -103,7 +108,7 @@ Concept:
         return response
 
     # ==================================================
-    # LOAD DATA
+    # STEP 4: LOAD DATA
     # ==================================================
     try:
         df = load_master()
@@ -114,11 +119,15 @@ Concept:
         return "⚠ HR dataset empty."
 
     # ==================================================
-    # NLU EXTRACTION
+    # STEP 5: NLU EXTRACTION
     # ==================================================
     metric = extract_metric(q)
     dimension = extract_dimension(q)
     chart_type = extract_chart_type(q)
+
+    # Support plural year automatically
+    if "years" in q:
+        dimension = "YEAR"
 
     wants_chart = any(k in q for k in ["chart", "plot", "graph", "bar", "pie", "line"])
     wants_prediction = any(k in q for k in ["predict", "prediction", "risk"])
@@ -134,6 +143,7 @@ Concept:
     # PREDICTION
     # ==================================================
     if wants_prediction:
+
         pred_df = predict_attrition(df)
         pred_df = add_risk_bucket(pred_df)
 
@@ -159,7 +169,7 @@ Concept:
             "- Workforce diversity"
         )
 
-    # Shared dimension map
+    # Shared dimension mapping
     col_map = {
         "DEPARTMENT": "Department",
         "LOCATION": "Location",
