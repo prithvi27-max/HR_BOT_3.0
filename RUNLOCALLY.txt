@@ -1,0 +1,136 @@
+=====================================================
+HR-GPT 3.0 – Local Setup & Execution Guide
+=====================================================
+
+This project is a multilingual HR Analytics Assistant built using:
+- Streamlit
+- Pandas
+- Plotly
+- Machine Learning
+- Groq LLaMA API
+- Hybrid LLM + Deterministic Analytics Architecture
+
+
+-----------------------------------------------------
+STEP 1: Install Python
+-----------------------------------------------------
+
+Install Python 3.10 or Python 3.11.
+
+Check version:
+
+python --version
+
+
+-----------------------------------------------------
+STEP 2: Clone the Repository
+-----------------------------------------------------
+
+git clone https://github.com/prithvi27-max/HR_BOT_3.0.git
+cd HR_BOT_3.0
+
+
+-----------------------------------------------------
+STEP 3: Create Virtual Environment (Recommended)
+-----------------------------------------------------
+
+For Windows:
+
+python -m venv venv
+venv\Scripts\activate
+
+For Mac/Linux:
+
+python3 -m venv venv
+source venv/bin/activate
+
+
+-----------------------------------------------------
+STEP 4: Install Required Dependencies
+-----------------------------------------------------
+
+pip install -r requirements.txt
+
+
+-----------------------------------------------------
+STEP 5: Configure API Key (Required for LLM)
+-----------------------------------------------------
+
+This project uses Groq API for:
+- Multilingual support
+- Intent classification
+- HR concept explanations
+
+OPTION 1 (Recommended):
+Create a file named ".env" in the project root folder.
+
+Add:
+
+GROQ_API_KEY=your_api_key_here
+
+
+OPTION 2 (Set environment variable manually)
+
+Windows:
+
+set GROQ_API_KEY=your_api_key_here
+
+Mac/Linux:
+
+export GROQ_API_KEY=your_api_key_here
+
+
+-----------------------------------------------------
+STEP 6: Run the Application
+-----------------------------------------------------
+
+streamlit run app.py
+
+
+Open in browser:
+
+http://localhost:8501
+
+
+-----------------------------------------------------
+SUPPORTED FEATURES
+-----------------------------------------------------
+
+- Headcount analytics
+- Attrition analytics
+- Salary analysis
+- Engagement metrics
+- Workforce diversity
+- Attrition risk prediction (ML)
+- Multilingual query support
+- Dynamic table or chart output
+
+
+-----------------------------------------------------
+NOTES
+-----------------------------------------------------
+
+1. If LLM is not configured, multilingual features will not work.
+2. Deterministic HR calculations are independent of LLM.
+3. Dataset must be available in project.
+4. Virtual environment is strongly recommended.
+
+
+-----------------------------------------------------
+TROUBLESHOOTING
+-----------------------------------------------------
+
+If dependencies fail:
+    pip install --upgrade pip
+    pip install -r requirements.txt
+
+If Streamlit does not start:
+    Check Python version (must be 3.10+)
+
+If API errors appear:
+    Verify GROQ_API_KEY is set correctly.
+
+
+=====================================================
+END
+=====================================================
