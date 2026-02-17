@@ -210,7 +210,10 @@ Question:
         dimension = extract_dimension(q)
         chart_type = extract_chart_type(q)
 
-    wants_chart = chart_type in ["BAR", "LINE", "PIE"]
+    explicit_chart_keywords = ["chart", "plot", "graph", "bar", "line", "pie"]
+
+    wants_chart = any(k in q for k in explicit_chart_keywords)
+
 
     # ==================================================
     # MODEL METRICS
