@@ -1,6 +1,17 @@
 # modules/analytics_router.py
 
 import pandas as pd
+import json
+import logging
+from functools import lru_cache
+
+# ===============================
+# LOGGING CONFIG
+# ===============================
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 # ===============================
 # CORE ANALYTICS
@@ -21,7 +32,7 @@ from modules.analytics import (
 )
 
 # ===============================
-# NLU
+# FALLBACK NLU
 # ===============================
 from modules.nlu import (
     extract_metric,
@@ -40,6 +51,81 @@ from ml.evaluate import load_ml_metrics
 
 
 # ======================================================
+# DATASET CACHING
+# ======================================================
+@lru_cache(maxsize=1)
+def get_cached_dataset():
+    return load_master()
+
+
+# ======================================================
+# INTENT CACHING
+# ======================================================
+@lru_cache(maxsize=100)
+def classify_intent_llm_cached(query: str):
+
+    prompt = f"""
+You are an HR analytics intent classifier.
+
+Supported metrics:
+- headcount
+- attrition
+- salary
+- engagement
+- gender
+
+Supported dimensions:
+- YEAR
+- DEPARTMENT
+- LOCATION
+- GENDER
+- NONE
+
+Supported chart types:
+- BAR
+- LINE
+- PIE
+- NONE
+
+Return ONLY valid JSON in this format:
+
+{{
+  "metric": "...",
+  "dimension": "...",
+  "chart": "...",
+  "confidence": 0.0
+}}
+
+Confidence must be between 0 and 1.
+
+If not HR-related:
+{{
+  "metric": null,
+  "dimension": null,
+  "chart": "NONE",
+  "confidence": 0.0
+}}
+
+Question:
+{query}
+"""
+
+    try:
+        response = call_llm(prompt, language="en")
+        response = response.strip()
+        response = response.replace("```json", "").replace("```", "")
+        parsed = json.loads(response)
+
+        logging.info(f"LLM intent: {parsed}")
+
+        return parsed
+
+    except Exception as e:
+        logging.error(f"LLM intent classification failed: {e}")
+        return None
+
+
+# ======================================================
 # MAIN ROUTER
 # ======================================================
 def process_query(query: str, language: str = "en"):
@@ -50,7 +136,7 @@ def process_query(query: str, language: str = "en"):
     original_query = query.strip()
 
     # ==================================================
-    # STEP 1: TRANSLATE FIRST (CRITICAL FIX)
+    # TRANSLATION
     # ==================================================
     if language != "en":
         try:
@@ -58,92 +144,84 @@ def process_query(query: str, language: str = "en"):
                 f"""
 Translate the following HR analytics question into English.
 Return ONLY the translated sentence.
-Do NOT add explanation.
 
 Question:
 {original_query}
 """,
                 language="en"
             )
-
             q = translated_query.lower().strip()
-
-        except Exception:
+            logging.info(f"Translated query: {q}")
+        except Exception as e:
+            logging.error(f"Translation failed: {e}")
             return "⚠ Unable to process multilingual request."
     else:
         q = original_query.lower().strip()
 
     # ==================================================
-    # STEP 2: GREETING (STRICT MATCH ONLY)
+    # GREETING
     # ==================================================
-    greetings = ["hi", "hello", "hey", "hii", "hola", "hallo"]
-
-    if q in greetings:
+    if q in ["hi", "hello", "hey", "hola", "hallo"]:
         return "👋 Hello! Ask me about headcount, attrition, salary, engagement, or diversity."
 
     # ==================================================
-    # STEP 3: DEFINITION INTENT
+    # DEFINITION
     # ==================================================
-    definition_keywords = ["what is", "definition", "define", "explain", "meaning"]
-
-    if any(k in q for k in definition_keywords):
-
-        response = call_llm(
-            f"""
-You are an HR analytics assistant.
-Explain this HR concept clearly in simple business language.
-
-Concept:
-{q}
-""",
+    if any(k in q for k in ["what is", "define", "explain", "meaning"]):
+        return call_llm(
+            f"Explain this HR concept clearly:\n\n{q}",
             language="en"
         )
 
-        if language != "en":
-            response = call_llm(
-                f"Translate this into {language}:\n\n{response}",
-                language
-            )
-
-        return response
-
     # ==================================================
-    # STEP 4: LOAD DATA
+    # LOAD DATA (CACHED)
     # ==================================================
     try:
-        df = load_master()
-    except Exception:
+        df = get_cached_dataset()
+    except Exception as e:
+        logging.error(f"Dataset load failed: {e}")
         return "⚠ Unable to load HR data."
 
     if df is None or df.empty:
         return "⚠ HR dataset empty."
 
     # ==================================================
-    # STEP 5: NLU EXTRACTION
+    # LLM INTENT CLASSIFICATION
     # ==================================================
-    metric = extract_metric(q)
-    dimension = extract_dimension(q)
-    chart_type = extract_chart_type(q)
+    intent = classify_intent_llm_cached(q)
 
-    # Support plural year automatically
-    if "years" in q:
-        dimension = "YEAR"
+    metric = None
+    dimension = None
+    chart_type = "NONE"
+    confidence = 0.0
 
-    wants_chart = any(k in q for k in ["chart", "plot", "graph", "bar", "pie", "line"])
-    wants_prediction = any(k in q for k in ["predict", "prediction", "risk"])
-    wants_model_metrics = any(k in q for k in ["auc", "precision", "recall"])
+    if intent:
+        metric = intent.get("metric")
+        dimension = intent.get("dimension")
+        chart_type = intent.get("chart")
+        confidence = intent.get("confidence", 0.0)
+
+    # ==================================================
+    # CONFIDENCE THRESHOLD
+    # ==================================================
+    if confidence < 0.6:
+        logging.info("Low confidence → fallback to rule-based NLU")
+        metric = extract_metric(q)
+        dimension = extract_dimension(q)
+        chart_type = extract_chart_type(q)
+
+    wants_chart = chart_type in ["BAR", "LINE", "PIE"]
 
     # ==================================================
     # MODEL METRICS
     # ==================================================
-    if wants_model_metrics:
+    if any(k in q for k in ["auc", "precision", "recall"]):
         return load_ml_metrics()
 
     # ==================================================
     # PREDICTION
     # ==================================================
-    if wants_prediction:
-
+    if any(k in q for k in ["predict", "risk"]):
         pred_df = predict_attrition(df)
         pred_df = add_risk_bucket(pred_df)
 
@@ -158,7 +236,7 @@ Concept:
     # ==================================================
     # DOMAIN GUARD
     # ==================================================
-    if metric is None:
+    if not metric:
         return (
             "⚠ This assistant is limited to HR analytics.\n\n"
             "Supported topics:\n"
@@ -169,7 +247,6 @@ Concept:
             "- Workforce diversity"
         )
 
-    # Shared dimension mapping
     col_map = {
         "DEPARTMENT": "Department",
         "LOCATION": "Location",
@@ -181,7 +258,7 @@ Concept:
     # ==================================================
     if metric == "headcount":
 
-        if not dimension:
+        if not dimension or dimension == "NONE":
             return pd.DataFrame({
                 "Metric": ["Active Headcount"],
                 "Value": [active_headcount(df)]
@@ -192,9 +269,6 @@ Concept:
         else:
             data = active_headcount_by(df, col_map.get(dimension))
 
-        if data is None or len(data) == 0:
-            return "⚠ Headcount data not available."
-
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Headcount")
 
     # ==================================================
@@ -202,7 +276,7 @@ Concept:
     # ==================================================
     if metric == "attrition":
 
-        if not dimension:
+        if not dimension or dimension == "NONE":
             return pd.DataFrame({
                 "Metric": ["Attrition Rate (%)"],
                 "Value": [attrition_rate(df)]
@@ -213,9 +287,6 @@ Concept:
         else:
             data = attrition_rate_by(df, col_map.get(dimension))
 
-        if data is None or len(data) == 0:
-            return "⚠ Attrition data not available."
-
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Attrition Rate")
 
     # ==================================================
@@ -223,16 +294,13 @@ Concept:
     # ==================================================
     if metric == "salary":
 
-        if not dimension:
+        if not dimension or dimension == "NONE":
             return pd.DataFrame({
                 "Metric": ["Average Salary"],
                 "Value": [average_salary(df)]
             })
 
         data = average_salary_by(df, col_map.get(dimension))
-
-        if data is None or len(data) == 0:
-            return "⚠ Salary data not available."
 
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Average Salary")
 
@@ -241,7 +309,7 @@ Concept:
     # ==================================================
     if metric == "engagement":
 
-        if not dimension:
+        if not dimension or dimension == "NONE":
             return pd.DataFrame({
                 "Metric": ["Average Engagement Score"],
                 "Value": [average_engagement(df)]
@@ -249,19 +317,13 @@ Concept:
 
         data = engagement_by(df, col_map.get(dimension))
 
-        if data is None or len(data) == 0:
-            return "⚠ Engagement data not available."
-
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Engagement Score")
 
     # ==================================================
-    # DIVERSITY
+    # GENDER
     # ==================================================
     if metric == "gender":
 
         data = gender_distribution(df)
-
-        if data is None or len(data) == 0:
-            return "⚠ Gender distribution not available."
 
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Count")

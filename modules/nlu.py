@@ -3,132 +3,144 @@
 import re
 
 # ==================================================
-# TEXT NORMALIZATION
+# NORMALIZATION
 # ==================================================
 def normalize_text(text: str) -> str:
-    """
-    Lowercase + remove extra spaces
-    """
     text = text.lower()
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
 
-def contains_phrase(text: str, phrase: str) -> bool:
+def contains(text: str, phrase: str) -> bool:
     """
-    Word-boundary safe phrase matching
-    Prevents accidental substring matches
+    Safe word-boundary matching
     """
     pattern = r"\b" + re.escape(phrase) + r"\b"
     return re.search(pattern, text) is not None
 
 
 # ==================================================
-# METRIC KEYWORDS
+# METRIC KEYWORDS (FALLBACK ONLY)
 # ==================================================
 metric_keywords = {
     "headcount": [
-        "headcount", "employee count", "employees",
-        "workforce", "staff size", "total employees",
-        "manpower", "number of employees"
+        "headcount",
+        "employee",
+        "employees",
+        "employee count",
+        "workforce",
+        "staff",
+        "manpower",
+        "people",
+        "persons",
+        "individuals",
+        "participants"
     ],
     "attrition": [
-        "attrition", "turnover", "churn",
-        "resignation", "exit rate", "separation",
-        "leaving rate"
+        "attrition",
+        "turnover",
+        "resignation",
+        "exit",
+        "separation"
     ],
     "salary": [
-        "salary", "ctc", "compensation",
-        "pay", "package", "remuneration",
-        "average pay"
-    ],
-    "gender": [
-        "gender", "gender mix", "male female",
-        "diversity", "dei", "gender distribution"
+        "salary",
+        "compensation",
+        "pay",
+        "ctc",
+        "remuneration"
     ],
     "engagement": [
-        "engagement", "satisfaction",
-        "happiness", "sentiment",
-        "employee satisfaction"
+        "engagement",
+        "satisfaction",
+        "sentiment",
+        "happiness"
     ],
-    "performance": [
-        "performance", "rating", "kpi", "okr"
-    ],
-    "promotion": [
-        "promotion", "career growth", "progression"
-    ],
-    "tenure": [
-        "tenure", "experience", "years worked"
-    ],
-    "forecast": [
-        "forecast", "predict", "projection"
+    "gender": [
+        "gender",
+        "diversity",
+        "male",
+        "female"
     ]
 }
 
 
 # ==================================================
-# DIMENSION KEYWORDS
+# DIMENSION KEYWORDS (FALLBACK)
 # ==================================================
 dimension_keywords = {
     "YEAR": [
-        "year", "yearly", "annual",
-        "over time", "trend", "by year"
+        "year",
+        "years",
+        "annual",
+        "annually",
+        "per year",
+        "by year",
+        "over time",
+        "trend"
     ],
     "DEPARTMENT": [
-        "department", "function", "team",
+        "department",
+        "function",
+        "team",
         "business unit"
     ],
     "LOCATION": [
-        "location", "region", "country",
-        "city", "office"
+        "location",
+        "region",
+        "country",
+        "city",
+        "office"
     ],
     "GENDER": [
-        "gender", "male", "female"
+        "gender",
+        "male",
+        "female"
     ]
 }
 
 
 # ==================================================
-# METRIC EXTRACTION
+# METRIC EXTRACTION (FALLBACK)
 # ==================================================
 def extract_metric(query: str):
     q = normalize_text(query)
 
-    for metric, synonyms in metric_keywords.items():
-        for phrase in synonyms:
-            if contains_phrase(q, phrase):
+    for metric, words in metric_keywords.items():
+        for word in words:
+            if contains(q, word):
                 return metric
 
     return None
 
 
 # ==================================================
-# DIMENSION EXTRACTION
+# DIMENSION EXTRACTION (FALLBACK)
 # ==================================================
 def extract_dimension(query: str):
     q = normalize_text(query)
 
-    for dim, synonyms in dimension_keywords.items():
-        for phrase in synonyms:
-            if contains_phrase(q, phrase):
+    for dim, words in dimension_keywords.items():
+        for word in words:
+            if contains(q, word):
                 return dim
 
     return None
 
 
 # ==================================================
-# CHART TYPE EXTRACTION
+# CHART TYPE EXTRACTION (FALLBACK)
 # ==================================================
 def extract_chart_type(query: str):
     q = normalize_text(query)
 
-    if any(contains_phrase(q, k) for k in ["line", "trend", "over time", "time series"]):
+    if any(contains(q, k) for k in ["line", "trend", "time series"]):
         return "LINE"
 
-    if any(contains_phrase(q, k) for k in ["pie", "ratio", "share"]):
+    if any(contains(q, k) for k in ["pie", "ratio", "share"]):
         return "PIE"
 
-    if any(contains_phrase(q, k) for k in ["bar", "compare", "comparison"]):
+    if any(contains(q, k) for k in ["bar", "compare", "comparison"]):
         return "BAR"
 
-    return "BAR"  # default
+    return "NONE"
