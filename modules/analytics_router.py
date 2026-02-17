@@ -8,7 +8,6 @@ import pandas as pd
 from modules.analytics import (
     load_master,
     active_headcount,
-    total_headcount,
     active_headcount_by,
     active_headcount_by_year,
     attrition_rate,
@@ -48,13 +47,35 @@ def process_query(query: str, language: str = "en"):
     if not query or not query.strip():
         return "Please enter a valid HR analytics question."
 
-    q = query.lower().strip()
+    original_query = query.strip()
+    q = original_query.lower()
 
     # ==================================================
-    # GREETING (FIRST — Always)
+    # GREETING
     # ==================================================
-    if q in ["hi", "hello", "hey", "hii", "hola", "hallo"]:
+    greetings = ["hi", "hello", "hey", "hii", "hola", "hallo"]
+
+    if any(g in q for g in greetings) and len(q.split()) <= 3:
         return "👋 Hello! Ask me about headcount, attrition, salary, engagement, or diversity."
+
+    # ==================================================
+    # TRANSLATE NON-ENGLISH TO ENGLISH FOR NLU
+    # ==================================================
+    if language != "en":
+        try:
+            translated_query = call_llm(
+                f"""
+Translate this HR analytics question into English.
+Return ONLY the translated sentence.
+
+Question:
+{original_query}
+""",
+                language="en"
+            )
+            q = translated_query.lower().strip()
+        except Exception:
+            return "⚠ Unable to process multilingual request."
 
     # ==================================================
     # DEFINITION INTENT
@@ -62,16 +83,24 @@ def process_query(query: str, language: str = "en"):
     definition_keywords = ["what is", "definition", "define", "explain", "meaning"]
 
     if any(k in q for k in definition_keywords):
-        return call_llm(
+        response = call_llm(
             f"""
 You are an HR analytics assistant.
 Explain this HR concept clearly in simple business language.
 
 Concept:
-{query}
+{q}
 """,
-            language
+            language="en"
         )
+
+        if language != "en":
+            response = call_llm(
+                f"Translate this into {language}:\n\n{response}",
+                language
+            )
+
+        return response
 
     # ==================================================
     # LOAD DATA
@@ -96,10 +125,15 @@ Concept:
     wants_model_metrics = any(k in q for k in ["auc", "precision", "recall"])
 
     # ==================================================
-    #  PREDICTION BLOCK
+    # MODEL METRICS
+    # ==================================================
+    if wants_model_metrics:
+        return load_ml_metrics()
+
+    # ==================================================
+    # PREDICTION
     # ==================================================
     if wants_prediction:
-
         pred_df = predict_attrition(df)
         pred_df = add_risk_bucket(pred_df)
 
@@ -110,12 +144,6 @@ Concept:
             )
 
         return pred_df.sort_values("Attrition_Risk", ascending=False)
-
-    # ==================================================
-    # MODEL METRICS
-    # ==================================================
-    if wants_model_metrics:
-        return load_ml_metrics()
 
     # ==================================================
     # DOMAIN GUARD
@@ -131,6 +159,13 @@ Concept:
             "- Workforce diversity"
         )
 
+    # Shared dimension map
+    col_map = {
+        "DEPARTMENT": "Department",
+        "LOCATION": "Location",
+        "GENDER": "Gender"
+    }
+
     # ==================================================
     # HEADCOUNT
     # ==================================================
@@ -142,19 +177,13 @@ Concept:
                 "Value": [active_headcount(df)]
             })
 
-        col_map = {
-            "DEPARTMENT": "Department",
-            "LOCATION": "Location",
-            "GENDER": "Gender"
-        }
-
         if dimension == "YEAR":
             data = active_headcount_by_year(df)
         else:
             data = active_headcount_by(df, col_map.get(dimension))
 
         if data is None or len(data) == 0:
-            return "⚠ Headcount data not available for this breakdown."
+            return "⚠ Headcount data not available."
 
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Headcount")
 
@@ -169,19 +198,13 @@ Concept:
                 "Value": [attrition_rate(df)]
             })
 
-        col_map = {
-            "DEPARTMENT": "Department",
-            "LOCATION": "Location",
-            "GENDER": "Gender"
-        }
-
         if dimension == "YEAR":
             data = attrition_by_year(df)
         else:
             data = attrition_rate_by(df, col_map.get(dimension))
 
         if data is None or len(data) == 0:
-            return "⚠ Attrition data not available for this breakdown."
+            return "⚠ Attrition data not available."
 
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Attrition Rate")
 
@@ -196,16 +219,10 @@ Concept:
                 "Value": [average_salary(df)]
             })
 
-        col_map = {
-            "DEPARTMENT": "Department",
-            "LOCATION": "Location",
-            "GENDER": "Gender"
-        }
-
         data = average_salary_by(df, col_map.get(dimension))
 
         if data is None or len(data) == 0:
-            return "⚠ Salary data not available for this breakdown."
+            return "⚠ Salary data not available."
 
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Average Salary")
 
@@ -220,16 +237,10 @@ Concept:
                 "Value": [average_engagement(df)]
             })
 
-        col_map = {
-            "DEPARTMENT": "Department",
-            "LOCATION": "Location",
-            "GENDER": "Gender"
-        }
-
         data = engagement_by(df, col_map.get(dimension))
 
         if data is None or len(data) == 0:
-            return "⚠ Engagement data not available for this breakdown."
+            return "⚠ Engagement data not available."
 
         return build_chart(data, chart_type) if wants_chart else data.reset_index(name="Engagement Score")
 
